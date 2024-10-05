@@ -25,10 +25,11 @@ namespace Game
         private List<CardData> activeCardData = new ();
         private Encounter currentEncounter;
         
-        
         private List<Gnack> activeGnacks = new ();
         private List<Card> activeCards = new ();
         private Card hiddenCard;
+        
+        private int flipCount = 0;
         
         public void Start()
         {
@@ -63,6 +64,8 @@ namespace Game
                 Vector3 position = board.cards[i].position;
                 card = Instantiate(CardPrefab, position + Vector3.forward * 7f, Quaternion.identity);
                 card.Instantiate(cardData, i, position);
+                card.CardBurnout += OnCardBurnout;
+                card.CardFlipped += OnCardFlipped;
                 activeCards.Add(card);
                 
                 yield return new WaitForSeconds(0.5f);
@@ -72,6 +75,7 @@ namespace Game
             card = Instantiate(CardPrefab, board.hidenCard.position + Vector3.forward * 7f, Quaternion.Euler(0, 0f, 180f));
             card.Instantiate(currentEncounter.hiddenCardData, 4, board.hidenCard.position);
             card.IsHidden = true;
+            card.CardVictory += OnCardVictory;
             hiddenCard = card;
         }
         
@@ -85,9 +89,9 @@ namespace Game
                 yield return new WaitForSeconds(0.5f);
             }
         }
-        
+
         private IEnumerator DestroyGnack(Gnack gnack)
-        {;
+        {
             yield return new WaitForSeconds(1f);
             Destroy(gnack.gameObject);
         }
@@ -111,6 +115,23 @@ namespace Game
             StartCoroutine(DestroyGnack(gnack));
         }
         
+        private void Burnout(int gnackId)
+        {
+            // permanently remove the gnacks location
+            board.gnacks.RemoveAt(gnackId);
+            
+            if (board.gnacks.Count == 0)
+            {
+                // end the game
+                Debug.Log("Game Over");
+            }
+            
+            // kill the gnack
+            KillGnack(gnackId);   
+        }
+
+        public void Burnout() => Burnout(Random.Range(0, activeGnacks.Count));
+        
         private IEnumerator DrawCardsRoutine()
         {
             int count = activeCards is null ? 0 : activeCards.Count;
@@ -119,8 +140,12 @@ namespace Game
                 activeCards[i].RemoveCard();
             }
             
+            hiddenCard?.RemoveCard();
             activeCardData.Clear();
             activeCards.Clear();
+            
+            // reset flip count
+            flipCount = 0;
             
             yield return new WaitForSeconds(2f);
             
@@ -150,6 +175,29 @@ namespace Game
             // - update game state
         }
         
+        public void NextEncounter()
+        {
+            if (encounterQueue.Count == 0)
+            {
+                SwitchEncounter(FinalEncounter);
+                return;
+            }
+            
+            SwitchEncounter(encounterQueue.Dequeue());
+        }
         
+        public void OnCardVictory(Card card) => NextEncounter();
+        
+        public void OnCardBurnout(Card card) => Burnout();
+        
+        public void OnCardFlipped(Card card)
+        {
+            flipCount++;
+            if (flipCount == 4)
+            {
+                hiddenCard.Flip();
+                NextEncounter();
+            }
+        }
     }
 }
