@@ -70,8 +70,10 @@ namespace Game
             this.cardData = cardData;
             this.index = index;
             this.startPosition = startPosition;
-            targetPosition = startPosition;
             
+            // set card values
+            targetPosition = startPosition;
+            targetScale = startScale;
             cardValueText.text = cardData.cardValue + " of " + SuitNames[cardData.cardSuit];
         }
 
@@ -81,7 +83,7 @@ namespace Game
                 return;
             
             CurrentCard = this;
-            targetScale = startScale * 1.2f;
+            targetScale = startScale * 1.15f;
         }
         
         public List<Vector3> GetPoints(int nbOfPoints=10)
@@ -118,6 +120,9 @@ namespace Game
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
             
             // spring motion for scale
+            if (Mathf.Abs((transform.localScale - targetScale).sqrMagnitude) < 0.01f)
+                return;
+            
             transform.localScale = Util.MovingUtil.SpringDamp(transform.localScale, targetScale, ref velocity, spring, damping);
         }
         
