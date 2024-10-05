@@ -36,6 +36,9 @@ namespace Game
         private Vector3 targetPosition;
         private Vector3 startPosition;
         
+        private Vector3 targetScale;
+        private Vector3 startScale;
+        
         private Quaternion targetRotation;
         private Quaternion startRotation;
         
@@ -56,8 +59,10 @@ namespace Game
             collider = GetComponent<Collider>();
             bounds = collider.bounds;
             count = cardData.cardValue;
-            
+
             startRotation = transform.rotation;
+            startScale = transform.localScale;
+            targetScale = startScale;
         }
         
         public void Instantiate(CardData cardData, int index, Vector3 startPosition)
@@ -76,6 +81,7 @@ namespace Game
                 return;
             
             CurrentCard = this;
+            targetScale = startScale * 1.2f;
         }
         
         public List<Vector3> GetPoints(int nbOfPoints=10)
@@ -97,7 +103,10 @@ namespace Game
         private void OnMouseExit()
         {
             if (CurrentCard == this)
+            {
                 CurrentCard = null;
+                targetScale = startScale;
+            }
         }
 
         private void Update()
@@ -107,6 +116,9 @@ namespace Game
             
             // spring motion for rotation
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
+            
+            // spring motion for scale
+            transform.localScale = Util.MovingUtil.SpringDamp(transform.localScale, targetScale, ref velocity, spring, damping);
         }
         
         private void OnCardFlipped() => CardFlipped?.Invoke(this);
@@ -131,12 +143,11 @@ namespace Game
 
         public void DropGnack(Gnack gnackObject)
         {
-            if (CurrentCard != this)
-                return;
-            
             count--;
             if (gnackObject.cardSuit == cardData.cardSuit) count--;
-            if (count == 0) Flip();
+            cardValueText.text = count + " of " + SuitNames[cardData.cardSuit];
+            
+            if (count <= 0) Flip();
         }
     }
 }

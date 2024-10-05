@@ -62,7 +62,6 @@ namespace Game
         
         private void DropGnack(Card card)
         {
-            
             card.DropGnack(this);
         }
         
@@ -72,6 +71,11 @@ namespace Game
             if (CurrentGnack != this)
                 return;
 
+            if (Card.CurrentCard != null)
+            {
+                DropGnack(Card.CurrentCard);
+            }
+            
             // reset the position
             targetPosition = startPosition;
 

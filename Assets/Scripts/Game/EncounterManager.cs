@@ -77,7 +77,7 @@ namespace Game
         
         private IEnumerator SpawnGnacks()
         {
-            for (int i = activeGnacks.Count; i < 7; i++)
+            for (int i = activeGnacks.Count; i < board.gnacks.Count; i++)
             {
                 Gnack gnack = Instantiate(GetRandomGnack(), board.gnacks[i].position, Quaternion.identity);
                 gnack.gnackId = i;
