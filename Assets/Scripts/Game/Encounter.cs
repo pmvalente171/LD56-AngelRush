@@ -25,7 +25,7 @@ namespace Game
         [Space]
         public List<string> stressDialogue;
         
-        public Queue<Hint> getHints()
+        public Queue<Hint> GetHints()
         {
             hints.Sort((a, b) => a.hintPriority.CompareTo(b.hintPriority));
             Queue<Hint> hintQueue = new(hints);

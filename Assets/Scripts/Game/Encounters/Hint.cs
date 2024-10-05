@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Game.Encounters
@@ -13,5 +14,8 @@ namespace Game.Encounters
         public string hintDialogue;
         
         public int hintPriority;
+        
+        [Space]
+        public List<string> context;
     }
 }
