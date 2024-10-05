@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Game.Util;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -8,7 +6,6 @@ namespace Game
 {
     public class EncounterManager : MonoBehaviour
     {
-        
         public Encounter InitialEncounter;
         public List<Encounter> encounters;
         public Encounter FinalEncounter;
