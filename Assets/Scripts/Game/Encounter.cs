@@ -8,7 +8,7 @@ namespace Game
     [CreateAssetMenu(fileName = "GameEncounter", menuName = "Game/GameEncounter", order = 0)]
     public class Encounter : ScriptableObject
     {
-        public Card hiddenCard;
+        [FormerlySerializedAs("hiddenCard")] public CardData hiddenCardData;
         public List<Hint> hints;
         
         [Space] 

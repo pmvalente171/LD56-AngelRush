@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using Game.Util;
 using UnityEngine;
 
@@ -7,6 +8,8 @@ namespace Game
     public class Gnack : MonoBehaviour
     {
         public static Gnack CurrentGnack;
+     
+        [HideInInspector] public int gnackId;
         
         public float spring = 0.6f;
         public float damp = 1f;
@@ -16,8 +19,8 @@ namespace Game
         private Camera mainCamera;
         private Collider collider;
         
-        private Vector3 startPosition;
-        private Vector3 targetPosition;
+        [HideInInspector] public Vector3 startPosition;
+        [HideInInspector] public Vector3 targetPosition;
         private Vector3 velocity;
         
         private Quaternion startRotation;
@@ -25,7 +28,7 @@ namespace Game
         
         private bool isDragging;
         
-        private void Start()
+        private IEnumerator Start()
         {
             mainCamera = FindObjectsOfType<Camera>()[0];
             collider = GetComponent<Collider>();
@@ -35,6 +38,18 @@ namespace Game
             
             targetPosition = startPosition;
             targetRotation = startRotation;
+            
+            var finalScale = transform.localScale;
+            float f = 0f;
+            while (f < 1f)
+            {
+                f += Time.deltaTime * 2f;
+                transform.localScale = Vector3.Lerp(Vector3.zero, finalScale, f);
+                yield return null;
+            }
+            
+            transform.localScale = finalScale;
+            collider.enabled = true;
         }
 
         private Vector3 GrabMousePosition()
@@ -45,7 +60,7 @@ namespace Game
             return mousePos;
         }
         
-        private void DropGnack(CardObject card)
+        private void DropGnack(Card card)
         {
             
             card.DropGnack(this);

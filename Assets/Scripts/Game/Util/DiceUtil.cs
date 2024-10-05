@@ -41,7 +41,7 @@ namespace Game.Util
         
         public static CardSuit DCardSuit()
         {
-            return (CardSuit) D(4);
+            return (CardSuit)(D(4) - 1);
         }
     }
 }

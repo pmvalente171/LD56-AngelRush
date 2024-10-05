@@ -5,26 +5,26 @@ namespace Game
 {
     public class CardDeck
     {
-        public Queue<Card> deck = new ();
+        public Queue<CardData> deck = new ();
 
         public void Shuffle(int deckSize=60)
         {
             deck.Clear();
             for (int i = 0; i < deckSize; i++)
             {
-                deck.Enqueue(Card.RandomCard());
+                deck.Enqueue(CardData.RandomCard());
             }
         }
         
-        public Card Draw() => deck.Dequeue();
+        public CardData Draw() => deck.Dequeue();
         
-        public void Add(Card card) => deck.Enqueue(card);
+        public void Add(CardData cardData) => deck.Enqueue(cardData);
         
         public void ExtendDeck(int deckSize=60)
         {
             for (int i = 0; i < deckSize; i++)
             {
-                Add(Card.RandomCard());
+                Add(CardData.RandomCard());
             }
         }
         
