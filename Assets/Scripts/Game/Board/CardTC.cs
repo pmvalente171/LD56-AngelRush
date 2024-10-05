@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Game
+namespace Game.Board
 {
     public class CardTC : MonoBehaviour
     {

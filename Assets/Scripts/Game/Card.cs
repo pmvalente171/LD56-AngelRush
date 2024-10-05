@@ -17,6 +17,11 @@ namespace Game
             this.cardSuit = cardSuit;
         }
         
-        public Card() : this(DiceUtil.D6(), DiceUtil.DCardSuit()) { }
+        public Card() { }
+        
+        public static Card RandomCard()
+        {
+            return new Card(DiceUtil.D(6), DiceUtil.DCardSuit());
+        }
     }
 }

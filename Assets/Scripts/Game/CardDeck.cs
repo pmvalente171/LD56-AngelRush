@@ -12,7 +12,7 @@ namespace Game
             deck.Clear();
             for (int i = 0; i < deckSize; i++)
             {
-                deck.Enqueue(new Card());
+                deck.Enqueue(Card.RandomCard());
             }
         }
         
@@ -24,7 +24,7 @@ namespace Game
         {
             for (int i = 0; i < deckSize; i++)
             {
-                Add(new Card());
+                Add(Card.RandomCard());
             }
         }
         
