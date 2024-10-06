@@ -3,9 +3,20 @@ using System.Collections;
 using Game.Util;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Game
 {
+    [Serializable]
+    public enum ArcanaType
+    {
+        NONE,
+        KNIGHT,
+        QUEEN,
+        KING,
+        PAGE
+    }
+    
     public class Gnack : MonoBehaviour
     {
         public static Gnack CurrentGnack;
@@ -15,11 +26,14 @@ namespace Game
         
         public float TimeToLive = 120f;
         public TMP_Text gnackTimerText;
+        public TMP_Text gnackNameText;
         [Space]
         public float spring = 0.6f;
         public float damp = 1f;
         
         [Space] public CardSuit cardSuit;
+        public ArcanaType arcanaType;
+        [TextArea] public string gnackDescription;
         
         private Camera mainCamera;
         private Collider collider;
@@ -79,6 +93,9 @@ namespace Game
             StartCoroutine(GnackTimer());
         }
 
+        public void UpdateName() =>
+            gnackNameText.text = Card.SuitNames[cardSuit];
+
         private Vector3 GrabMousePosition()
         {
             Vector3 mousePos = Input.mousePosition;
@@ -89,13 +106,28 @@ namespace Game
         
         private void DropGnack(Card card)
         {
+            int ammount = currentCard?.cardData.cardSuit == cardSuit ? 2 : 1;
+            Gnack knight = null;
+            bool isKnightOnCard = currentCard != null && currentCard.IsKnightOnCard(out knight);
+            
+            if (currentCard != null && arcanaType == ArcanaType.KNIGHT)
+                ammount += currentCard.activeGnacks.Count - 1; // minus 1 because the knight itself is already on the card
+            else if (arcanaType == ArcanaType.PAGE)
+                ammount *= 2;
+            else if (arcanaType == ArcanaType.QUEEN)
+                ammount *= 0;
+            else if (arcanaType == ArcanaType.KING) // need to verify if this makes sense
+                ammount *= 0;
+            
+            if (isKnightOnCard && knight != this)
+                ammount += 1;
+            
             if (card == null || (card.WasFlipped && !card.IsHidden))
             {
                 if (currentCard is null)
                     return;
                 
-                currentCard.Count = currentCard.cardData.cardSuit == cardSuit ? 
-                    currentCard.Count + 2 : currentCard.Count + 1;
+                currentCard.Count += ammount; 
                 currentCard.activeGnacks.Remove(this);
                 
                 isOnCard = false;
@@ -109,8 +141,7 @@ namespace Game
                 if (currentCard is null)
                     return;
                 
-                currentCard.Count = currentCard.cardData.cardSuit == cardSuit ? 
-                    currentCard.Count + 2 : currentCard.Count + 1;
+                currentCard.Count += ammount;
                 currentCard.activeGnacks.Remove(this);
                 
                 isOnCard = false;
@@ -120,8 +151,7 @@ namespace Game
             
             if (currentCard is not null)
             {
-                currentCard.Count = currentCard.cardData.cardSuit == cardSuit ? 
-                    currentCard.Count + 2 : currentCard.Count + 1;
+                currentCard.Count += ammount; 
                 currentCard.activeGnacks.Remove(this);
             }
             

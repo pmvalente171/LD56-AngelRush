@@ -14,6 +14,7 @@ namespace Game
         public GameObject CrossPrefab;
         public Card CardPrefab;
         public List<Gnack> GnackPrefabs;
+        public List<Gnack> GnackArcanaPrefabs;
         
         [Space]
         public Board board;
@@ -60,8 +61,11 @@ namespace Game
         
         private Gnack GetRandomGnack()
         {
-            int index = Random.Range(0, GnackPrefabs.Count);
-            return GnackPrefabs[index];
+            // TODO: Implement Arcana gnacks
+            var gnackList = DiceUtil.D100() < 50 ? GnackPrefabs : GnackArcanaPrefabs;
+            
+            int index = Random.Range(0, gnackList.Count);
+            return gnackList[index];
         }
         
         private IEnumerator SpawnCards()
@@ -89,13 +93,18 @@ namespace Game
             hiddenCard = card;
         }
         
-        private IEnumerator SpawnGnacks(int ammount = 7)
+        private IEnumerator SpawnGnacks(int amount = 7)
         {
-            int max = Mathf.Min(activeGnacks.Count + ammount, board.gnacks.Count);
+            int max = Mathf.Min(activeGnacks.Count + amount, board.gnacks.Count);
             for (int i = activeGnacks.Count; i < max; i++)
             {
                 Gnack gnack = Instantiate(GetRandomGnack(), board.gnacks[i].position, Quaternion.identity);
                 gnack.gnackId = i;
+                if (gnack.arcanaType != ArcanaType.NONE)
+                {
+                    gnack.cardSuit = DiceUtil.DCardSuit();
+                    gnack.UpdateName();
+                }
                 activeGnacks.Add(gnack);
                 yield return new WaitForSeconds(0.5f);
             }
@@ -147,8 +156,21 @@ namespace Game
             
             if (gnack.isOnCard)
             {
-                gnack.currentCard.Count = gnack.currentCard.cardData.cardSuit == gnack.cardSuit ? 
-                    gnack.currentCard.Count + 2 : gnack.currentCard.Count + 1;
+                bool isKnightOnCard = gnack.currentCard.IsKnightOnCard(out var knight);
+                int ammout = gnack.currentCard.cardData.cardSuit == gnack.cardSuit ? 2 : 1;
+                if (gnack.arcanaType == ArcanaType.KNIGHT)
+                    ammout += gnack.currentCard.activeGnacks.Count - 1;
+                else if (gnack.arcanaType == ArcanaType.PAGE)
+                    ammout *= 2;
+                else if (gnack.arcanaType == ArcanaType.QUEEN)
+                    ammout *= 0;
+                else if (gnack.arcanaType == ArcanaType.KING)
+                    ammout *= 0;
+                
+                if (isKnightOnCard && knight != gnack)
+                    ammout += 1;
+                
+                gnack.currentCard.Count += ammout;
                 gnack.currentCard.activeGnacks.Remove(gnack);
             }
             

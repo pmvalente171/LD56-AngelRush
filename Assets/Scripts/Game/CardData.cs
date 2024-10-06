@@ -21,7 +21,7 @@ namespace Game
         
         public static CardData RandomCard()
         {
-            return new CardData(DiceUtil.DValue(4), DiceUtil.DCardSuit());
+            return new CardData(DiceUtil.DValue(6), DiceUtil.DCardSuit());
         }
     }
 }

@@ -2009,6 +2009,9 @@ MonoBehaviour:
   - {fileID: 2805536086979045809, guid: 0458c741789159b45a3cdae27bc92786, type: 3}
   - {fileID: 2805536086979045809, guid: 75c0dc5931b419444b6cde9af501d8f2, type: 3}
   - {fileID: 2805536086979045809, guid: 0d80c9064a6d7dc45a5e62df45012bd4, type: 3}
+  GnackArcanaPrefabs:
+  - {fileID: 2805536086979045809, guid: 62765723a7afc0048a2be4d2b6579105, type: 3}
+  - {fileID: 2805536086979045809, guid: b03802289fd699c41aefb29f74df5da1, type: 3}
   board:
     hidenCard: {fileID: 478921647}
     cards:

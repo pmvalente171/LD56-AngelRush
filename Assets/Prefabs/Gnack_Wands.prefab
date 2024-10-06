@@ -381,12 +381,17 @@ MonoBehaviour:
   currentCard: {fileID: 0}
   TimeToLive: 240
   gnackTimerText: {fileID: 3660300380688386898}
+  gnackNameText: {fileID: 2991059064289947043}
   spring: 2
   damp: 10
   cardSuit: 0
+  arcanaType: 0
+  gnackDescription: 
   isOnCard: 0
   startPosition: {x: 0, y: 0, z: 0}
   targetPosition: {x: 0, y: 0, z: 0}
+  startScale: {x: 0, y: 0, z: 0}
+  targetScale: {x: 0, y: 0, z: 0}
 --- !u!1 &7530326390497050349
 GameObject:
   m_ObjectHideFlags: 0

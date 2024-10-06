@@ -10,7 +10,7 @@ namespace Game
 {
     public class Card : MonoBehaviour
     {
-        private static Dictionary<CardSuit, String> SuitNames = new() // TODO: Temporary
+        public static Dictionary<CardSuit, String> SuitNames = new() // TODO: Temporary
         {
             {CardSuit.COINS, "Coins"},
             {CardSuit.CUPS, "Cups"},
@@ -184,6 +184,12 @@ namespace Game
                 OnCardVictory();
             }
         }
+        
+        public bool IsKnightOnCard(out Gnack knight)
+        {
+            knight = activeGnacks.Find(g => g.arcanaType == ArcanaType.KNIGHT);
+            return knight != null;
+        }
 
         public void DropGnack(Gnack gnackObject)
         {
@@ -201,8 +207,23 @@ namespace Game
                 return;
             } 
             
-            count--;
-            if (gnackObject.cardSuit == cardData.cardSuit) count--;
+            var isKnightOnCard = IsKnightOnCard(out var knight);
+            
+            int amount = gnackObject.cardSuit == cardData.cardSuit ? 2 : 1;
+            if (gnackObject.arcanaType == ArcanaType.KNIGHT)
+                amount += activeGnacks.Count - 1;
+            else if (gnackObject.arcanaType == ArcanaType.PAGE)
+                amount *= 2;
+            else if (gnackObject.arcanaType == ArcanaType.QUEEN)
+                amount *= 0;
+            else if (gnackObject.arcanaType == ArcanaType.KING)
+                amount *= 0;
+            
+            if (isKnightOnCard && knight != gnackObject)
+                amount += 1;
+            
+            
+            count -= amount;
             UpdateCount();
         }
     }
