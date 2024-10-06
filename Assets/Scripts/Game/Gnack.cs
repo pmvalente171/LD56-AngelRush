@@ -38,7 +38,7 @@ namespace Game
         [TextArea] public string gnackDescription;
         
         private Camera mainCamera;
-        private Collider collider;
+        [HideInInspector] public Collider gnackCollider;
         
         [HideInInspector] public bool isOnCard;
         
@@ -55,10 +55,11 @@ namespace Game
         private bool isDragging;
         private Coroutine gnackTimer;
         private UnitDescription unitDescription;
+        private float f;
         
         private IEnumerator GnackTimer()
         {
-            float f = 0f;
+            f = 0f;
             while (f < 1f)
             {
                 f += Time.deltaTime / TimeToLive;
@@ -68,15 +69,32 @@ namespace Game
             
             gnackTimer = null;
             var encounterManager = FindObjectOfType<EncounterManager>();
-            encounterManager.KillGnack(gnackId);
+            encounterManager.Burnout(gnackId);
             encounterManager.VerifyDeath();
+        }
+        
+        public void StopTimer()
+        {
+            if (gnackTimer == null)
+                return;
+            
+            StopCoroutine(gnackTimer);
+            gnackTimer = null;
+        }
+        
+        public void StartTimer()
+        {
+            if (gnackTimer != null)
+                return;
+            
+            gnackTimer = StartCoroutine(GnackTimer());
         }
         
         private IEnumerator Start()
         {
             mainCamera = FindObjectsOfType<Camera>()[0];
             unitDescription = FindObjectOfType<UnitDescription>();
-            collider = GetComponent<Collider>();
+            gnackCollider = GetComponent<Collider>();
             
             startPosition = transform.position;
             startRotation = transform.rotation;
@@ -97,7 +115,6 @@ namespace Game
             }
             
             transform.localScale = finalScale;
-            collider.enabled = true;
             gnackTimer = StartCoroutine(GnackTimer());
         }
 
@@ -195,7 +212,11 @@ namespace Game
             // reset the current gnack
             CurrentGnack = null;
             isDragging = false;
-            collider.enabled = !isDragging;
+            gnackCollider.enabled = !isDragging;
+            
+            // verify gnack swap
+            if (SwapGnack.CurrentGnackSwap != null)
+                SwapGnack.CurrentGnackSwap.Swap(this);
         }
 
         // on mouse down
@@ -203,7 +224,7 @@ namespace Game
         {
             CurrentGnack = this;
             isDragging = true;
-            collider.enabled = !isDragging;
+            gnackCollider.enabled = !isDragging;
             
             // update the the unit description
             unitDescription.SetValue(gnackName.ToUpper(), gnackDescription);

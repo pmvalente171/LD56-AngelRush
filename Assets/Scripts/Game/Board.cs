@@ -8,6 +8,7 @@ namespace Game
     public class Board
     {
         public Transform hidenCard;
+        public Transform swapGnack;
         public List<Transform> cards = new();
         public List<Transform> gnacks = new();
         
