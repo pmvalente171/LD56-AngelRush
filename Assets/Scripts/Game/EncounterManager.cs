@@ -8,6 +8,7 @@ namespace Game
 {
     public class EncounterManager : MonoBehaviour
     {
+        public GameObject CrossPrefab;
         public Card CardPrefab;
         public List<Gnack> GnackPrefabs;
         
@@ -76,6 +77,7 @@ namespace Game
             card.Instantiate(currentEncounter.hiddenCardData, 4, board.hidenCard.position);
             card.IsHidden = true;
             card.CardVictory += OnCardVictory;
+            card.CardBurnout += OnCardBurnout;
             hiddenCard = card;
         }
         
@@ -105,6 +107,13 @@ namespace Game
             
             activeGnacks.Remove(gnack);
             
+            if (activeGnacks.Count == 0)
+            {
+                // game over
+                print("Game Over");
+                return;
+            }
+            
             // reorganize gnack ids
             for (int i = 0; i < activeGnacks.Count; i++)
             {
@@ -120,12 +129,19 @@ namespace Game
         private void Burnout(int gnackId)
         {
             // permanently remove the gnacks location
+            Instantiate(CrossPrefab, board.gnacks[gnackId].position, Quaternion.identity);
             board.gnacks.RemoveAt(gnackId);
             
-            if (board.gnacks.Count == 0)
+            // get the gnack
+            Gnack gnack = activeGnacks.Find(g => g.gnackId == gnackId);
+            if (gnack == null)
+                return;
+            
+            if (gnack.isOnCard)
             {
-                // end the game
-                Debug.Log("Game Over");
+                gnack.currentCard.Count = gnack.currentCard.cardData.cardSuit == gnack.cardSuit ? 
+                    gnack.currentCard.Count + 2 : gnack.currentCard.Count + 1;
+                gnack.currentCard.activeGnacks.Remove(gnack);
             }
             
             // kill the gnack
@@ -204,7 +220,8 @@ namespace Game
                 KillGnack(gnack.gnackId);
             
             // aaand a new gnack appears :X
-            StartCoroutine(SpawnGnacks(1));
+            int halfCardValue = Mathf.CeilToInt(card.cardData.cardValue / 2f); // Im being nice here
+            StartCoroutine(SpawnGnacks(halfCardValue));
             
             if (flipCount == 4)
             {

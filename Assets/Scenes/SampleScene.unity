@@ -1270,6 +1270,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a12160ed26f4633853123d7c735de3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CrossPrefab: {fileID: 1128066535837894141, guid: 5348cc3b5616a8f4c8a70b2c70de4575, type: 3}
   CardPrefab: {fileID: 4753343050739015127, guid: 7c31eb9c98d5df141962c6f76144d3e2, type: 3}
   GnackPrefabs:
   - {fileID: 2805536086979045809, guid: b1b9720f910e1994084a07c24339050f, type: 3}

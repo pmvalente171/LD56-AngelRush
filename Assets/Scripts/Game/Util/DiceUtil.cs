@@ -38,6 +38,17 @@ namespace Game.Util
         {
             return D(100);
         }
+
+        public static int DValue(int maxValue)
+        {
+            int result = 0;
+            for (int i = 0; i < maxValue - 1; i++)
+            {
+                if (D6() > 3) result++;
+            }
+            
+            return result + 1;
+        }
         
         public static CardSuit DCardSuit()
         {

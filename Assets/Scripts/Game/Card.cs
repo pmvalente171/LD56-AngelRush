@@ -147,8 +147,8 @@ namespace Game
         }
         
         private void OnCardFlipped() => CardFlipped?.Invoke(this);
-        private void OnCardBurnout() => CardBurnout?.Invoke(this);
         private void OnCardVictory() => CardVictory?.Invoke(this);
+        public void OnCardBurnout() => CardBurnout?.Invoke(this);
         
         public void Flip()
         {

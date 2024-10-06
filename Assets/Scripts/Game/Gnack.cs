@@ -10,6 +10,7 @@ namespace Game
         public static Gnack CurrentGnack;
      
         [HideInInspector] public int gnackId;
+        [HideInInspector] public Card currentCard;
         
         public float spring = 0.6f;
         public float damp = 1f;
@@ -31,7 +32,6 @@ namespace Game
         private Quaternion startRotation;
         private Quaternion targetRotation;
         
-        private Card currentCard;
         
         private bool isDragging;
         
@@ -88,6 +88,7 @@ namespace Game
             
             if (card.IsHidden && card.cardData.cardSuit != cardSuit)
             {
+                card.OnCardBurnout();
                 if (currentCard is null)
                     return;
                 
