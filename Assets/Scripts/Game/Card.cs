@@ -33,7 +33,7 @@ namespace Game
         [HideInInspector] public bool WasFlipped = false;
         [HideInInspector] public List<Gnack> activeGnacks = new();
         
-        private Collider collider;
+        private Collider cardCollider;
         private Bounds bounds;
         
         private Vector3 velocity;
@@ -84,8 +84,8 @@ namespace Game
 
         private void Start()
         {
-            collider = GetComponent<Collider>();
-            bounds = collider.bounds;
+            cardCollider = GetComponent<Collider>();
+            bounds = cardCollider.bounds;
             count = cardData.cardValue;
 
             startRotation = transform.rotation;

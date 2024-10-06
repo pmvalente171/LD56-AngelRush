@@ -44,10 +44,7 @@ namespace Game
 
         private List<Gnack> activeGnacks = new();
         private List<Card> activeCards = new();
-        private List<DestroyedSlot> destroyedSlots = new();
-        private Card hiddenCard;
 
-        private Queue<Hint> hintQueue = new();
 
         private int flipCount = 0;
         private int encouterCount = 0;
@@ -112,14 +109,6 @@ namespace Game
 
                 yield return new WaitForSeconds(0.5f);
             }
-
-            // instance a flipped card
-            card = Instantiate(CardPrefab, board.hidenCard.position + Vector3.forward * 7f,
-                Quaternion.Euler(0, 0f, 180f));
-            card.Instantiate(currentEncounter.hiddenCardData, 4, board.hidenCard.position);
-            card.IsHidden = true;
-            card.CardVictory += OnCardVictory;
-            hiddenCard = card;
         }
 
         private IEnumerator SpawnGnacks(int amount = 7)
@@ -193,7 +182,6 @@ namespace Game
                 activeCards[i].RemoveCard();
             }
 
-            hiddenCard?.RemoveCard();
             activeCardData.Clear();
             activeCards.Clear();
 
@@ -227,16 +215,9 @@ namespace Game
         public void SwitchEncounter(Encounter newEncounter)
         {
             encouterCount++;
-
             currentEncounter = newEncounter;
-            hintQueue = newEncounter.GetHints();
-
             activeCardData.Clear();
             DrawCards();
-
-            // other stuff:
-            // - update UI
-            // - update game state
         }
 
         public void NextEncounter()
@@ -270,7 +251,6 @@ namespace Game
                 KillGnack(gnack.gnackId);
 
             // aaand a new gnack appears :X
-            // int halfCardValue = Mathf.CeilToInt(card.cardData.cardValue / 2f); // BALANCING
             StartCoroutine(SpawnGnacks(gnacksInCard));
 
             // reset all the gnacks
@@ -314,15 +294,8 @@ namespace Game
                         if (otherCard.Count <= 0)
                             continue;
 
-                        int ammout = card.cardData.cardSuit == gnack.cardSuit ? 2 : 1; // BALANCING
+                        int ammout = card.cardData.cardSuit == gnack.cardSuit ? 2 : 1; 
                         otherCard.Count -= ammout;
-                    }
-
-                    // damage the hidden card
-                    if (hiddenCard.Count > 0 && hiddenCard.WasFlipped)
-                    {
-                        int ammout = card.cardData.cardSuit == gnack.cardSuit ? 2 : 1; // BALANCING
-                        hiddenCard.Count -= ammout;
                     }
                 }
                 
@@ -331,15 +304,12 @@ namespace Game
             }
 
             // aaand a new gnack appears :X
-            // int halfCardValue = Mathf.CeilToInt(card.cardData.cardValue / 2f); // BALANCING
             StartCoroutine(SpawnGnacks(gnacksInCard));
 
             if (flipCount == 4)
             {
                 scoreManager.AddScore("Victory", 3, 10f); // BALANCING
                 scoreManager.VerifyAndStartCombo("COMPLETE", new ComboString("Vicotry COMBO!", 5, 10f));
-                
-                hiddenCard.Flip(true);
                 NextEncounter();
             }
         }
