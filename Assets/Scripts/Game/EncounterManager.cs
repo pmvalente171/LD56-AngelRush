@@ -95,7 +95,9 @@ namespace Game
         
         private IEnumerator SpawnGnacks(int amount = 7)
         {
+            // why am i getting index out of range errors?
             int max = Mathf.Min(activeGnacks.Count + amount, board.gnacks.Count);
+            
             for (int i = activeGnacks.Count; i < max; i++)
             {
                 Gnack gnack = Instantiate(GetRandomGnack(), board.gnacks[i].position, Quaternion.identity);
@@ -119,7 +121,7 @@ namespace Game
         public void KillGnack(int gnackId)
         {
             Gnack gnack = activeGnacks.Find(g => g.gnackId == gnackId);
-            if (gnack == null)
+            if (gnack is null)
                 return;
             
             activeGnacks.Remove(gnack);
@@ -271,9 +273,52 @@ namespace Game
             if (card.IsHidden)
                 return;
 
+            bool isQueenOnCard = card.IsQueenOnCard(out var queen);
+            var savedGnacks = new List<Gnack>();
+            
+            // if there is a queen on the card save a gnack
+            if (isQueenOnCard)
+            {
+                // remove the queen from the card
+                card.activeGnacks.Remove(queen);
+                
+                // remove a random gnack from the card
+                int gnackIndex = Random.Range(0, card.activeGnacks.Count);
+                var gnack = card.activeGnacks[gnackIndex];
+                card.activeGnacks.Remove(gnack);
+                savedGnacks.Add(gnack);
+                
+                // add the queen back to the gnack list
+                card.activeGnacks.Add(queen);
+            }
+            
             // kill them all!!!
             foreach (var gnack in card.activeGnacks)
+            {
                 KillGnack(gnack.gnackId);
+                if (gnack.arcanaType == ArcanaType.KING)
+                {
+                    // damage all the other cards
+                    foreach (var otherCard in activeCards)
+                    {
+                        if (otherCard == card)
+                            continue;
+                        
+                        int ammout = otherCard.cardData.cardSuit == gnack.cardSuit ? 2 : 1;
+                        otherCard.Count -= ammout;
+                    }
+                }
+                    
+            }
+            
+            // reset all the saved gnacks
+            foreach (var gnack in savedGnacks)
+            {
+                gnack.targetPosition = gnack.startPosition;
+                gnack.targetScale = gnack.startScale;
+                gnack.isOnCard = false;
+                gnack.currentCard = null;
+            }
             
             // aaand a new gnack appears :X
             int halfCardValue = Mathf.CeilToInt(card.cardData.cardValue / 2f); // Im being nice here
@@ -291,6 +336,7 @@ namespace Game
                 return;
             }
             
+            CardSuit suit = card.activeGnacks == null || card.activeGnacks.Count == 0 ? card.cardData.cardSuit : card.activeGnacks[^1].cardSuit;
             encounterLog.ProcessHint(hintQueue.Dequeue(), card.activeGnacks[^1].cardSuit);
         }
     }

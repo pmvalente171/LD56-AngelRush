@@ -51,6 +51,7 @@ namespace Game
         private Quaternion targetRotation;
         
         private bool isDragging;
+        private Coroutine gnackTimer;
         
         private IEnumerator GnackTimer()
         {
@@ -58,10 +59,11 @@ namespace Game
             while (f < 1f)
             {
                 f += Time.deltaTime / TimeToLive;
-                gnackTimerText.text = $"{(int) (TimeToLive - Time.time)}";
+                gnackTimerText.text = $"{(int) (TimeToLive - TimeToLive * f)}";
                 yield return null;
             }
             
+            gnackTimer = null;
             FindObjectOfType<EncounterManager>().KillGnack(gnackId);
         }
         
@@ -90,7 +92,7 @@ namespace Game
             
             transform.localScale = finalScale;
             collider.enabled = true;
-            StartCoroutine(GnackTimer());
+            gnackTimer = StartCoroutine(GnackTimer());
         }
 
         public void UpdateName() =>
@@ -157,7 +159,6 @@ namespace Game
             
             isOnCard = true;
             card.activeGnacks.Add(this);
-            card.DropGnack(this);
             
             Vector3 cardPosition = card.GetRandomPosition();
             targetPosition = cardPosition;
@@ -165,6 +166,7 @@ namespace Game
             
             float scaleMultiplier = card.cardData.cardSuit == cardSuit ? 0.8f : 0.5f;
             targetScale = startScale * scaleMultiplier;
+            card.DropGnack(this);
         }
         
         // on cursor exit

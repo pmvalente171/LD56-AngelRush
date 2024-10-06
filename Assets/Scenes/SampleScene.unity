@@ -2012,6 +2012,8 @@ MonoBehaviour:
   GnackArcanaPrefabs:
   - {fileID: 2805536086979045809, guid: 62765723a7afc0048a2be4d2b6579105, type: 3}
   - {fileID: 2805536086979045809, guid: b03802289fd699c41aefb29f74df5da1, type: 3}
+  - {fileID: 2805536086979045809, guid: c59eb009c713ecf42b7fd6136c8b7886, type: 3}
+  - {fileID: 2805536086979045809, guid: b62b754f47a087c4ba9b2c104738f557, type: 3}
   board:
     hidenCard: {fileID: 478921647}
     cards:

@@ -190,6 +190,12 @@ namespace Game
             knight = activeGnacks.Find(g => g.arcanaType == ArcanaType.KNIGHT);
             return knight != null;
         }
+        
+        public bool IsQueenOnCard(out Gnack queen)
+        {
+            queen = activeGnacks.Find(g => g.arcanaType == ArcanaType.QUEEN);
+            return queen != null;
+        }
 
         public void DropGnack(Gnack gnackObject)
         {
@@ -210,6 +216,7 @@ namespace Game
             var isKnightOnCard = IsKnightOnCard(out var knight);
             
             int amount = gnackObject.cardSuit == cardData.cardSuit ? 2 : 1;
+            
             if (gnackObject.arcanaType == ArcanaType.KNIGHT)
                 amount += activeGnacks.Count - 1;
             else if (gnackObject.arcanaType == ArcanaType.PAGE)
