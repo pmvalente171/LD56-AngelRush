@@ -31,6 +31,7 @@ namespace Game
         public int index;
         
         [HideInInspector] public bool WasFlipped = false;
+        
         private Collider collider;
         private Bounds bounds;
         
@@ -51,8 +52,16 @@ namespace Game
         public event Action<Card> CardFlipped;
         public event Action<Card> CardBurnout;
         public event Action<Card> CardVictory;
-        
-        public int Count => count;
+
+        public int Count
+        {
+            get => count;
+            set
+            {
+                count = value;
+                UpdateCount();
+            }
+        }
 
         public bool IsHidden
         {
@@ -97,6 +106,7 @@ namespace Game
         {
             int posIndex = Random.Range(0, possiblePositions.Count);
             var position = possiblePositions[posIndex].position;
+            
             possiblePositions.RemoveAt(posIndex);
             return position;
         }
@@ -108,22 +118,6 @@ namespace Game
             
             CurrentCard = this;
             targetScale = startScale * 1.15f;
-        }
-        
-        public List<Vector3> GetPoints(int nbOfPoints=10)
-        {
-            Vector3 center = bounds.center;
-            Vector3 extents = bounds.extents;
-            
-            List<Vector3> points = new();
-            for (int i = 0; i < nbOfPoints; i++)
-            {
-                float x = Random.Range(center.x - extents.x, center.x + extents.x);
-                float y = Random.Range(center.y - extents.y, center.y + extents.y);
-                points.Add(new Vector3(x, y, 0));
-            }
-            
-            return points;
         }
         
         private void OnMouseExit()
@@ -173,6 +167,22 @@ namespace Game
             isBeingRemoved = true;
             StartCoroutine(RemoveCardRoutine());
         }
+        
+        private void UpdateCount()
+        {
+            cardValueText.text = count + " of " + SuitNames[cardData.cardSuit];
+
+            if (count <= 0 && !WasFlipped)
+            {
+                WasFlipped = true;
+                Flip();
+            }
+            else if (count <= 0 && isHidden)
+            {
+                Flip();
+                OnCardVictory();
+            }
+        }
 
         public void DropGnack(Gnack gnackObject)
         {
@@ -192,19 +202,7 @@ namespace Game
             
             count--;
             if (gnackObject.cardSuit == cardData.cardSuit) count--;
-            cardValueText.text = count + " of " + SuitNames[cardData.cardSuit];
-            
-            if (count <= 0 && !WasFlipped)
-            {
-                WasFlipped = true;
-                Flip();
-            }
-            else if (count <= 0 && isHidden)
-            {
-                Flip();
-                OnCardVictory();
-            }
+            UpdateCount();
         }
-
     }
 }

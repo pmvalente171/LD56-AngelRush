@@ -23,12 +23,13 @@ namespace Game
         [HideInInspector] public Vector3 targetPosition;
         private Vector3 velocity;
         
-        
         private Vector3 startScale;
         private Vector3 targetScale;
         
         private Quaternion startRotation;
         private Quaternion targetRotation;
+        
+        private Card currentCard;
         
         private bool isDragging;
         
@@ -67,20 +68,46 @@ namespace Game
             return mousePos;
         }
         
-        private bool DropGnack(Card card)
+        private void DropGnack(Card card)
         {
             if (card == null || (card.WasFlipped && !card.IsHidden))
-                return false;
+            {
+                if (currentCard is null)
+                    return;
+                
+                currentCard.Count = currentCard.cardData.cardSuit == cardSuit ? 
+                    currentCard.Count + 2 : currentCard.Count + 1;
+                
+                currentCard = null;
+                return;
+            }
             
+            if (card.IsHidden && card.cardData.cardSuit != cardSuit)
+            {
+                if (currentCard is null)
+                    return;
+                
+                currentCard.Count = currentCard.cardData.cardSuit == cardSuit ? 
+                    currentCard.Count + 2 : currentCard.Count + 1;
+                
+                currentCard = null;
+                return;
+            }
+            
+            if (currentCard is not null)
+            {
+                currentCard.Count = currentCard.cardData.cardSuit == cardSuit ? 
+                    currentCard.Count + 2 : currentCard.Count + 1;
+            }
             
             card.DropGnack(this);
             
             Vector3 cardPosition = card.GetRandomPosition();
             targetPosition = cardPosition;
+            currentCard = card;
             
             float scaleMultiplier = card.cardData.cardSuit == cardSuit ? 0.8f : 0.5f;
             targetScale = startScale * scaleMultiplier;
-            return true;
         }
         
         // on cursor exit
@@ -88,19 +115,18 @@ namespace Game
         {
             if (CurrentGnack != this)
                 return;
-
-            bool succ = false;
             
             // reset the scale and position
             targetScale = startScale;
             targetPosition = startPosition;
             
-            if (Card.CurrentCard != null)
-                succ = DropGnack(Card.CurrentCard);
+            // if (Card.CurrentCard != null)
+            DropGnack(Card.CurrentCard);
             
             // reset the rotation
             targetRotation = startRotation;
-
+            
+            // reset the current gnack
             CurrentGnack = null;
             isDragging = false;
             collider.enabled = !isDragging;
