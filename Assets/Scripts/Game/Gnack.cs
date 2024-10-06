@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using Game.UI;
 using Game.Util;
 using TMPro;
 using UnityEngine;
@@ -31,7 +32,8 @@ namespace Game
         public float spring = 0.6f;
         public float damp = 1f;
         
-        [Space] public CardSuit cardSuit;
+        [Space] public string gnackName;
+        public CardSuit cardSuit;
         public ArcanaType arcanaType;
         [TextArea] public string gnackDescription;
         
@@ -52,6 +54,7 @@ namespace Game
         
         private bool isDragging;
         private Coroutine gnackTimer;
+        private UnitDescription unitDescription;
         
         private IEnumerator GnackTimer()
         {
@@ -70,6 +73,7 @@ namespace Game
         private IEnumerator Start()
         {
             mainCamera = FindObjectsOfType<Camera>()[0];
+            unitDescription = FindObjectOfType<UnitDescription>();
             collider = GetComponent<Collider>();
             
             startPosition = transform.position;
@@ -178,6 +182,7 @@ namespace Game
             // reset the scale and position
             targetScale = startScale;
             targetPosition = startPosition;
+            unitDescription.Hide();
             
             // if (Card.CurrentCard != null)
             DropGnack(Card.CurrentCard);
@@ -197,6 +202,9 @@ namespace Game
             CurrentGnack = this;
             isDragging = true;
             collider.enabled = !isDragging;
+            
+            // update the the unit description
+            unitDescription.SetValue(gnackName.ToUpper(), gnackDescription);
             
             // rotate the gnack towards the camera
             targetRotation = Quaternion.LookRotation(mainCamera.transform.forward, Vector3.up);

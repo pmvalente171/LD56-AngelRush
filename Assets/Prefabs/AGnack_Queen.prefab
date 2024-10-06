@@ -893,6 +893,7 @@ MonoBehaviour:
   gnackNameText: {fileID: 8234961943375433559}
   spring: 2
   damp: 10
+  gnackName: Queen
   cardSuit: 3
   arcanaType: 2
   gnackDescription: When removed saves a random pawn from the card, however, deals

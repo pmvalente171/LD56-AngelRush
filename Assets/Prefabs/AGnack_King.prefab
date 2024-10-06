@@ -831,6 +831,7 @@ MonoBehaviour:
   gnackNameText: {fileID: 8234961943375433559}
   spring: 2
   damp: 10
+  gnackName: King
   cardSuit: 3
   arcanaType: 3
   gnackDescription: When removed damages all the the other cards, however, deals

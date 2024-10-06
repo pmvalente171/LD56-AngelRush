@@ -108,6 +108,7 @@ namespace Game
                     gnack.UpdateName();
                 }
                 activeGnacks.Add(gnack);
+                max = Mathf.Min(max, board.gnacks.Count); // TODO: cop out
                 yield return new WaitForSeconds(0.5f);
             }
         }
@@ -205,7 +206,9 @@ namespace Game
             }
             
             StartCoroutine(SpawnCards());
-            StartCoroutine(SpawnGnacks());
+            if (currentEncounter == InitialEncounter)
+                StartCoroutine(SpawnGnacks());
+            
         }
 
         private void DrawCards()
@@ -304,11 +307,20 @@ namespace Game
                         if (otherCard == card)
                             continue;
                         
+                        if (otherCard.Count <= 0)
+                            continue;
+                        
                         int ammout = otherCard.cardData.cardSuit == gnack.cardSuit ? 2 : 1;
                         otherCard.Count -= ammout;
                     }
-                }
                     
+                    // damage the hidden card
+                    if (hiddenCard.Count > 0 && hiddenCard.WasFlipped)
+                    {
+                        int ammout = hiddenCard.cardData.cardSuit == gnack.cardSuit ? 2 : 1;
+                        hiddenCard.Count -= ammout;
+                    }
+                }
             }
             
             // reset all the saved gnacks
@@ -327,17 +339,14 @@ namespace Game
             if (flipCount == 4)
             {
                 hiddenCard.Flip();
-                if (DiceUtil.D6() < 4)
-                {
-                    print("You were unlucky! >:(");
-                    Burnout();
-                }
+                print("You were unlucky! >:(");
+                Burnout();
                 NextEncounter();
                 return;
             }
             
             CardSuit suit = card.activeGnacks == null || card.activeGnacks.Count == 0 ? card.cardData.cardSuit : card.activeGnacks[^1].cardSuit;
-            encounterLog.ProcessHint(hintQueue.Dequeue(), card.activeGnacks[^1].cardSuit);
+            encounterLog.ProcessHint(hintQueue.Dequeue(), suit);
         }
     }
 }

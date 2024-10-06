@@ -640,6 +640,7 @@ MonoBehaviour:
   gnackNameText: {fileID: 8234961943375433559}
   spring: 2
   damp: 10
+  gnackName: Knight
   cardSuit: 3
   arcanaType: 1
   gnackDescription: The Knight  deals +1 damage for every pawn on a tile.

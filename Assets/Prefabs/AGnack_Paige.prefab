@@ -723,6 +723,7 @@ MonoBehaviour:
   gnackNameText: {fileID: 8234961943375433559}
   spring: 2
   damp: 10
+  gnackName: Page
   cardSuit: 3
   arcanaType: 4
   gnackDescription: The Page deals damage x2.

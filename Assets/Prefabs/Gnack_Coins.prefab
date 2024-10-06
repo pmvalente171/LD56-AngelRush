@@ -555,6 +555,7 @@ MonoBehaviour:
   gnackNameText: {fileID: 8234961943375433559}
   spring: 2
   damp: 10
+  gnackName: Pawn
   cardSuit: 3
   arcanaType: 0
   gnackDescription: Regular Pawns do double damage if they are on their corresponding

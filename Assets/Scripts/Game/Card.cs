@@ -59,6 +59,9 @@ namespace Game
             get => count;
             set
             {
+                if (value < 0)
+                    value = 0;
+                
                 count = value;
                 UpdateCount();
             }
