@@ -21,6 +21,8 @@ namespace Game
         
         public void SetGnack(Gnack newGnack)
         {
+            newGnack.isOnSwap = true;
+            
             gnack = newGnack;
             newGnack.startPosition = transform.position; // TODO: Fix this
             newGnack.targetPosition = transform.position; // TODO: Fix this

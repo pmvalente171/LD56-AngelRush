@@ -55,10 +55,14 @@ namespace Game
         private bool isDragging;
         private Coroutine gnackTimer;
         private UnitDescription unitDescription;
-        private float f;
+        private float f; 
+        
+        public bool isOnSwap = false;
         
         private IEnumerator GnackTimer()
         {
+            if (isOnSwap) yield break;
+            
             f = 0f;
             while (f < 1f)
             {
@@ -84,9 +88,6 @@ namespace Game
         
         public void StartTimer()
         {
-            if (gnackTimer != null)
-                return;
-            
             gnackTimer = StartCoroutine(GnackTimer());
         }
         
@@ -104,6 +105,9 @@ namespace Game
             
             startScale = transform.localScale;
             targetScale = startScale;
+            
+            this.f = 0f;
+            gnackTimerText.text = $"{(int)TimeToLive}";
             
             var finalScale = transform.localScale;
             float f = 0f;
