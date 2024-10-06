@@ -30,8 +30,8 @@ namespace Game
         [HideInInspector] public Vector3 targetPosition;
         private Vector3 velocity;
         
-        private Vector3 startScale;
-        private Vector3 targetScale;
+        [HideInInspector] public Vector3 startScale;
+        [HideInInspector] public Vector3 targetScale;
         
         private Quaternion startRotation;
         private Quaternion targetRotation;

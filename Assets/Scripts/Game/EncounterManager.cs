@@ -207,14 +207,38 @@ namespace Game
         {
             if (encounterQueue.Count == 0)
             {
-                SwitchEncounter(FinalEncounter);
+                SwitchEncounter(FinalEncounter); // TODO: Fix this lmao
                 return;
             }
             
             SwitchEncounter(encounterQueue.Dequeue());
         }
+
+        private void ResetGnacks()
+        {
+            foreach (var gnack in activeGnacks)
+            {
+                gnack.targetPosition = gnack.startPosition;
+                gnack.targetScale = gnack.startScale;
+                gnack.isOnCard = false;
+                gnack.currentCard = null;
+            }
+        }
         
-        public void OnCardVictory(Card card) => NextEncounter();
+        public void OnCardVictory(Card card) 
+        {
+            // kill them all!!!
+            foreach (var gnack in card.activeGnacks)
+                KillGnack(gnack.gnackId);
+            
+            // aaand a new gnack appears :X
+            int halfCardValue = Mathf.CeilToInt(card.cardData.cardValue / 2f); // Im being nice here
+            StartCoroutine(SpawnGnacks(halfCardValue));
+            
+            // reset all the gnacks
+            ResetGnacks();
+            NextEncounter();
+        }
         
         public void OnCardBurnout(Card card) => Burnout();
         

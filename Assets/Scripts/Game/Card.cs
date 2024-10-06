@@ -187,7 +187,7 @@ namespace Game
 
         public void DropGnack(Gnack gnackObject)
         {
-            if (isHidden && gnackObject.cardSuit != cardData.cardSuit)
+            if (isHidden && !WasFlipped && gnackObject.cardSuit != cardData.cardSuit)
             {
                 // take burnout
                 OnCardBurnout();
