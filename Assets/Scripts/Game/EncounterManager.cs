@@ -9,6 +9,13 @@ using Random = UnityEngine.Random;
 
 namespace Game
 {
+    public struct DestroyedSlot
+    {
+        public int slotId;
+        public Transform slot;
+        public GameObject cross;
+    }
+    
     public class EncounterManager : MonoBehaviour
     {
         public GameObject CrossPrefab;
@@ -31,6 +38,7 @@ namespace Game
 
         private List<Gnack> activeGnacks = new();
         private List<Card> activeCards = new();
+        private List<DestroyedSlot> destroyedSlots = new();
         private Card hiddenCard;
 
         private Queue<Hint> hintQueue = new();
@@ -65,6 +73,30 @@ namespace Game
             };
         }
         
+        public void RestoreRandomSlot()
+        {
+            if (destroyedSlots.Count == 0)
+                return;
+
+            int index = Random.Range(0, destroyedSlots.Count);
+            var slot = destroyedSlots[index];
+            destroyedSlots.RemoveAt(index);
+            
+            slot.cross.SetActive(false);
+            board.gnacks.Insert(index, slot.slot);
+            
+            // reorganize gnack ids
+            for (int i = 0; i < activeGnacks.Count; i++)
+            {
+                activeGnacks[i].gnackId = i;
+                activeGnacks[i].startPosition = board.gnacks[i].position;
+                if (!activeGnacks[i].isOnCard)
+                    activeGnacks[i].targetPosition = board.gnacks[i].position;
+            }
+            
+            // spawn a new gnack
+            StartCoroutine(SpawnGnacks(1));
+        }
 
         private Gnack GetRandomGnack()
         {
@@ -294,6 +326,11 @@ namespace Game
             if (isQueenOnCard)
             {
                 // TODO HEAL THE PLAYER
+                RestoreRandomSlot();
+                
+                // if the queen as the same suit as the card, heal the player
+                if (queen.cardSuit == card.cardData.cardSuit)
+                    RestoreRandomSlot();
             }
 
             // kill them all!!!

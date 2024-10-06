@@ -30,6 +30,7 @@ namespace Game
             if (newGnack.gnackCollider is null)
                 newGnack.gnackCollider = newGnack.GetComponent<Collider>();
             
+            newGnack.isOnSwap = true;
             newGnack.gnackCollider.enabled = false;
             newGnack.StopTimer();
         }
@@ -40,10 +41,12 @@ namespace Game
             gnack.targetPosition = other.startPosition;
             gnack.gnackCollider.enabled = true;
             gnack.gnackId = other.gnackId;
+            
+            gnack.isOnSwap = false;
             gnack.StartTimer();
             
-            SetGnack(other);
             OnGnackSwapped(gnack);
+            SetGnack(other);
         }
         
         private void OnMouseOver()
