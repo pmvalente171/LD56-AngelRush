@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Game.Encounters;
 using Game.UI;
 using Game.Util;
+using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -18,7 +19,13 @@ namespace Game
     
     public class EncounterManager : MonoBehaviour
     {
-        public GameObject CrossPrefab;
+        public int maxHp = 3;
+        public float startingScore = 20;
+
+        [Space] public TMP_Text hpText;
+        public TMP_Text scoreText;
+        
+        [Space] public GameObject CrossPrefab;
         public Card CardPrefab;
         public List<Gnack> GnackPrefabs;
         public List<Gnack> GnackArcanaPrefabs;
@@ -45,6 +52,8 @@ namespace Game
 
         private int flipCount = 0;
         private int encouterCount = 0;
+        private int currentHp = 3;
+        private float currentScore = 20;
 
         public void Start()
         {
@@ -60,6 +69,8 @@ namespace Game
             }
 
             SwitchEncounter(InitialEncounter);
+            currentScore = startingScore;
+            currentHp = maxHp;
             
             // instance a gnack on the swap gnack
             Gnack gnackToSwap = Instantiate(GetRandomGnack(), swapGnack.transform.position, Quaternion.identity);
@@ -73,29 +84,10 @@ namespace Game
             };
         }
         
-        public void RestoreRandomSlot()
+        public void RestoreHp()
         {
-            if (destroyedSlots.Count == 0)
-                return;
-
-            int index = Random.Range(0, destroyedSlots.Count);
-            var slot = destroyedSlots[index];
-            destroyedSlots.RemoveAt(index);
-            
-            slot.cross.SetActive(false);
-            board.gnacks.Insert(index, slot.slot);
-            
-            // reorganize gnack ids
-            for (int i = 0; i < activeGnacks.Count; i++)
-            {
-                activeGnacks[i].gnackId = i;
-                activeGnacks[i].startPosition = board.gnacks[i].position;
-                if (!activeGnacks[i].isOnCard)
-                    activeGnacks[i].targetPosition = board.gnacks[i].position;
-            }
-            
-            // spawn a new gnack
-            StartCoroutine(SpawnGnacks(1));
+            currentHp = Mathf.Min(maxHp, currentHp + 1);
+            hpText.text = $"HP: {currentHp}";
         }
 
         private Gnack GetRandomGnack()
@@ -118,7 +110,6 @@ namespace Game
                 Vector3 position = board.cards[i].position;
                 card = Instantiate(CardPrefab, position + Vector3.forward * 7f, Quaternion.identity);
                 card.Instantiate(cardData, i, position);
-                card.CardBurnout += OnCardBurnout;
                 card.CardFlipped += OnCardFlipped;
                 activeCards.Add(card);
 
@@ -131,7 +122,6 @@ namespace Game
             card.Instantiate(currentEncounter.hiddenCardData, 4, board.hidenCard.position);
             card.IsHidden = true;
             card.CardVictory += OnCardVictory;
-            card.CardBurnout += OnCardBurnout;
             hiddenCard = card;
         }
 
@@ -182,12 +172,8 @@ namespace Game
             StartCoroutine(DestroyGnack(gnack));
         }
 
-        public void Burnout(int gnackId)
+        public void Timeout(int gnackId)
         {
-            // permanently remove the gnacks location
-            Instantiate(CrossPrefab, board.gnacks[gnackId].position, Quaternion.identity);
-            board.gnacks.RemoveAt(gnackId);
-
             // get the gnack
             Gnack gnack = activeGnacks.Find(g => g.gnackId == gnackId);
             if (gnack is null)
@@ -195,27 +181,12 @@ namespace Game
             
             // kill the gnack
             KillGnack(gnackId);
-            bool flipCard = gnack.isOnCard;
-            if (gnack.isOnCard)
-            {
-                // remove the gnacks from the card
-                // gnack.currentCard.Count = 0;
-                
-                // reset the gnacks
-                for (int i = 0; i < activeGnacks.Count; i++)
-                {
-                    activeGnacks[i].targetPosition = activeGnacks[i].startPosition;
-                    activeGnacks[i].targetScale = activeGnacks[i].startScale;
-                    activeGnacks[i].isOnCard = false;
-                    activeGnacks[i].currentCard = null;
-                }
-            }
-
-            if (flipCard) gnack.currentCard.Count = 0;
-            VerifyDeath();
+            
+            // Spawn a new gnack
+            StartCoroutine(SpawnGnacks(1));
         }
 
-        public void Burnout() => Burnout(Random.Range(0, activeGnacks.Count));
+        public void Timeout() => Timeout(Random.Range(0, activeGnacks.Count));
 
         private IEnumerator DrawCardsRoutine()
         {
@@ -310,8 +281,6 @@ namespace Game
             NextEncounter();
         }
 
-        public void OnCardBurnout(Card card) => Burnout();
-
         public void OnCardFlipped(Card card)
         {
             flipCount++;
@@ -326,11 +295,11 @@ namespace Game
             if (isQueenOnCard)
             {
                 // TODO HEAL THE PLAYER
-                RestoreRandomSlot();
+                RestoreHp();
                 
                 // if the queen as the same suit as the card, heal the player
                 if (queen.cardSuit == card.cardData.cardSuit)
-                    RestoreRandomSlot();
+                    RestoreHp();
             }
 
             // kill them all!!!
@@ -373,13 +342,30 @@ namespace Game
                 NextEncounter();
             }
         }
-
-        public void VerifyDeath()
+        
+        public void TakeDamage(int damage)
         {
-            if (activeGnacks.Count == 0)
+            currentHp -= damage;
+            hpText.text = $"HP: {currentHp}";
+            if (currentHp <= 0)
             {
                 // game over
+                currentHp = 0;
                 print("Game Over");
+                hpText.text = $"HP: {currentHp}";
+            }
+        }
+        
+        public void TakeDamage() => TakeDamage(1);
+
+        private void Update()
+        { 
+            currentScore -= Time.deltaTime;
+
+            if (Time.frameCount % 10 == 0)
+            {
+                // update the score every 10 frames
+                scoreText.text = currentScore.ToString("F2");
             }
         }
     }

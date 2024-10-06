@@ -73,8 +73,8 @@ namespace Game
             
             gnackTimer = null;
             var encounterManager = FindObjectOfType<EncounterManager>();
-            encounterManager.Burnout(gnackId);
-            encounterManager.VerifyDeath();
+            encounterManager.Timeout(gnackId);
+            encounterManager.TakeDamage();
         }
         
         public void StopTimer()
