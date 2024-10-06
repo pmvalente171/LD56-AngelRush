@@ -40,12 +40,11 @@ namespace Game
         private Queue<Hint> hintQueue = new ();
         
         private int flipCount = 0;
+        private int encouterCount = 0;
         
         public void Start()
         {
             cardDeck = new CardDeck();
-            cardDeck.Shuffle();
-            
             encounterQueue = new Queue<Encounter>();
             
             int count = Mathf.Min(encounters.Count, 7);
@@ -62,7 +61,9 @@ namespace Game
         private Gnack GetRandomGnack()
         {
             // TODO: Implement Arcana gnacks
-            var gnackList = DiceUtil.D100() < 50 ? GnackPrefabs : GnackArcanaPrefabs;
+            int chance = 30 + encouterCount * 2;
+            chance = Mathf.Clamp(chance, 15, 30);
+            var gnackList = DiceUtil.D100() > chance ? GnackPrefabs : GnackArcanaPrefabs; // BALANCING
             
             int index = Random.Range(0, gnackList.Count);
             return gnackList[index];
@@ -127,13 +128,6 @@ namespace Game
             
             activeGnacks.Remove(gnack);
             
-            if (activeGnacks.Count == 0)
-            {
-                // game over
-                print("Game Over");
-                return;
-            }
-            
             // reorganize gnack ids
             for (int i = 0; i < activeGnacks.Count; i++)
             {
@@ -178,7 +172,13 @@ namespace Game
             }
             
             // kill the gnack
-            KillGnack(gnackId);   
+            KillGnack(gnackId);
+            if (activeGnacks.Count == 0)
+            {
+                // game over
+                print("Game Over");
+                return;
+            }
         }
 
         public void Burnout() => Burnout(Random.Range(0, activeGnacks.Count));
@@ -200,6 +200,12 @@ namespace Game
             
             yield return new WaitForSeconds(2f);
             
+            // BALANCING
+            if (encouterCount % 2 == 0)
+            {
+                cardDeck.cardValueRange++; // increase the card value range every 2 encounters
+            }
+            
             for (int i = 0; i < 4; i++)
             {
                 activeCardData.Add(cardDeck.Draw());
@@ -207,7 +213,7 @@ namespace Game
             
             StartCoroutine(SpawnCards());
             if (currentEncounter == InitialEncounter)
-                StartCoroutine(SpawnGnacks());
+                StartCoroutine(SpawnGnacks(5)); // BALANCING
             
         }
 
@@ -218,6 +224,8 @@ namespace Game
         
         public void SwitchEncounter(Encounter newEncounter)
         {
+            encouterCount++;
+            
             currentEncounter = newEncounter;
             hintQueue = newEncounter.GetHints();
             
@@ -259,8 +267,8 @@ namespace Game
                 KillGnack(gnack.gnackId);
             
             // aaand a new gnack appears :X
-            int halfCardValue = Mathf.CeilToInt(card.cardData.cardValue / 2f); // Im being nice here
-            StartCoroutine(SpawnGnacks(halfCardValue));
+            // int halfCardValue = Mathf.CeilToInt(card.cardData.cardValue / 2f); // BALANCING
+            StartCoroutine(SpawnGnacks(2));
             
             // reset all the gnacks
             ResetGnacks();
@@ -291,6 +299,15 @@ namespace Game
                 card.activeGnacks.Remove(gnack);
                 savedGnacks.Add(gnack);
                 
+                if (queen.cardSuit == card.cardData.cardSuit && card.activeGnacks.Count > 0)
+                {
+                    // remove another random gnack from the card
+                    gnackIndex = Random.Range(0, card.activeGnacks.Count);
+                    gnack = card.activeGnacks[gnackIndex];
+                    card.activeGnacks.Remove(gnack);
+                    savedGnacks.Add(gnack);
+                }
+                
                 // add the queen back to the gnack list
                 card.activeGnacks.Add(queen);
             }
@@ -310,14 +327,14 @@ namespace Game
                         if (otherCard.Count <= 0)
                             continue;
                         
-                        int ammout = otherCard.cardData.cardSuit == gnack.cardSuit ? 2 : 1;
+                        int ammout = card.cardData.cardSuit == gnack.cardSuit ? 2 : 1; // BALANCING
                         otherCard.Count -= ammout;
                     }
                     
                     // damage the hidden card
                     if (hiddenCard.Count > 0 && hiddenCard.WasFlipped)
                     {
-                        int ammout = hiddenCard.cardData.cardSuit == gnack.cardSuit ? 2 : 1;
+                        int ammout = card.cardData.cardSuit == gnack.cardSuit ? 2 : 1; // BALANCING
                         hiddenCard.Count -= ammout;
                     }
                 }
@@ -333,13 +350,12 @@ namespace Game
             }
             
             // aaand a new gnack appears :X
-            int halfCardValue = Mathf.CeilToInt(card.cardData.cardValue / 2f); // Im being nice here
-            StartCoroutine(SpawnGnacks(halfCardValue));
+            // int halfCardValue = Mathf.CeilToInt(card.cardData.cardValue / 2f); // BALANCING
+            StartCoroutine(SpawnGnacks(1));
             
             if (flipCount == 4)
             {
-                hiddenCard.Flip();
-                print("You were unlucky! >:(");
+                hiddenCard.Flip(true);
                 Burnout();
                 NextEncounter();
                 return;
@@ -348,5 +364,13 @@ namespace Game
             CardSuit suit = card.activeGnacks == null || card.activeGnacks.Count == 0 ? card.cardData.cardSuit : card.activeGnacks[^1].cardSuit;
             encounterLog.ProcessHint(hintQueue.Dequeue(), suit);
         }
-    }
+        
+        public void VerifyDeath()
+        {
+            if (activeGnacks.Count == 0)
+            {
+                // game over
+                print("Game Over");
+            }
+        }    }
 }

@@ -2032,7 +2032,7 @@ MonoBehaviour:
     - {fileID: 1686832078}
   InitialEncounter: {fileID: 11400000, guid: b7db4681ade3be344bb24bb20871a1b3, type: 2}
   encounters: []
-  FinalEncounter: {fileID: 11400000, guid: b7db4681ade3be344bb24bb20871a1b3, type: 2}
+  FinalEncounter: {fileID: 11400000, guid: b2136831764fe934d8693e1c120a8bf8, type: 2}
   encounterLog: {fileID: 139047728}
 --- !u!1 &1808907155
 GameObject:

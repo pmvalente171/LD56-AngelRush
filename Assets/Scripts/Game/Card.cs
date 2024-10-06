@@ -153,9 +153,14 @@ namespace Game
         private void OnCardVictory() => CardVictory?.Invoke(this);
         public void OnCardBurnout() => CardBurnout?.Invoke(this);
         
-        public void Flip()
+        public void Flip(bool special = false)
         {
             targetRotation = transform.rotation * Quaternion.Euler(0, 0, 180);
+            
+            // means its called from the outside
+            if (special) return;
+            
+            // means its called from the inside
             OnCardFlipped();
         }
         

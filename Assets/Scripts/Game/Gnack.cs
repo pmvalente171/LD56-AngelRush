@@ -67,7 +67,9 @@ namespace Game
             }
             
             gnackTimer = null;
-            FindObjectOfType<EncounterManager>().KillGnack(gnackId);
+            var encounterManager = FindObjectOfType<EncounterManager>();
+            encounterManager.KillGnack(gnackId);
+            encounterManager.VerifyDeath();
         }
         
         private IEnumerator Start()

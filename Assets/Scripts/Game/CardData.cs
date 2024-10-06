@@ -19,9 +19,9 @@ namespace Game
         
         public CardData() { }
         
-        public static CardData RandomCard()
+        public static CardData RandomCard(int val)
         {
-            return new CardData(DiceUtil.DValue(6), DiceUtil.DCardSuit());
+            return new CardData(DiceUtil.DValue(val), DiceUtil.DCardSuit());
         }
     }
 }
