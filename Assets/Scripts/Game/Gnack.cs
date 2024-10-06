@@ -19,6 +19,8 @@ namespace Game
         private Camera mainCamera;
         private Collider collider;
         
+        [HideInInspector] public bool isOnCard;
+        
         [HideInInspector] public Vector3 startPosition;
         [HideInInspector] public Vector3 targetPosition;
         private Vector3 velocity;
@@ -77,7 +79,9 @@ namespace Game
                 
                 currentCard.Count = currentCard.cardData.cardSuit == cardSuit ? 
                     currentCard.Count + 2 : currentCard.Count + 1;
+                currentCard.activeGnacks.Remove(this);
                 
+                isOnCard = false;
                 currentCard = null;
                 return;
             }
@@ -89,7 +93,9 @@ namespace Game
                 
                 currentCard.Count = currentCard.cardData.cardSuit == cardSuit ? 
                     currentCard.Count + 2 : currentCard.Count + 1;
+                currentCard.activeGnacks.Remove(this);
                 
+                isOnCard = false;
                 currentCard = null;
                 return;
             }
@@ -98,8 +104,11 @@ namespace Game
             {
                 currentCard.Count = currentCard.cardData.cardSuit == cardSuit ? 
                     currentCard.Count + 2 : currentCard.Count + 1;
+                currentCard.activeGnacks.Remove(this);
             }
             
+            isOnCard = true;
+            card.activeGnacks.Add(this);
             card.DropGnack(this);
             
             Vector3 cardPosition = card.GetRandomPosition();

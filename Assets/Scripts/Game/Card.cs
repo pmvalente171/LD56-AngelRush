@@ -31,6 +31,7 @@ namespace Game
         public int index;
         
         [HideInInspector] public bool WasFlipped = false;
+        [HideInInspector] public List<Gnack> activeGnacks = new();
         
         private Collider collider;
         private Bounds bounds;

@@ -79,9 +79,10 @@ namespace Game
             hiddenCard = card;
         }
         
-        private IEnumerator SpawnGnacks()
+        private IEnumerator SpawnGnacks(int ammount = 7)
         {
-            for (int i = activeGnacks.Count; i < board.gnacks.Count; i++)
+            int max = Mathf.Min(activeGnacks.Count + ammount, board.gnacks.Count);
+            for (int i = activeGnacks.Count; i < max; i++)
             {
                 Gnack gnack = Instantiate(GetRandomGnack(), board.gnacks[i].position, Quaternion.identity);
                 gnack.gnackId = i;
@@ -92,8 +93,8 @@ namespace Game
 
         private IEnumerator DestroyGnack(Gnack gnack)
         {
-            yield return new WaitForSeconds(1f);
             Destroy(gnack.gameObject);
+            yield return new WaitForSeconds(1f);
         }
         
         public void KillGnack(int gnackId)
@@ -109,7 +110,8 @@ namespace Game
             {
                 activeGnacks[i].gnackId = i;
                 activeGnacks[i].startPosition = board.gnacks[i].position;
-                activeGnacks[i].targetPosition = board.gnacks[i].position;
+                if (!activeGnacks[i].isOnCard)
+                    activeGnacks[i].targetPosition = board.gnacks[i].position;
             }
             
             StartCoroutine(DestroyGnack(gnack));
@@ -191,8 +193,19 @@ namespace Game
         public void OnCardBurnout(Card card) => Burnout();
         
         public void OnCardFlipped(Card card)
-        {
+        {            
             flipCount++;
+            
+            if (card.IsHidden)
+                return;
+
+            // kill them all!!!
+            foreach (var gnack in card.activeGnacks)
+                KillGnack(gnack.gnackId);
+            
+            // aaand a new gnack appears :X
+            StartCoroutine(SpawnGnacks(1));
+            
             if (flipCount == 4)
             {
                 hiddenCard.Flip();
