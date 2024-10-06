@@ -718,7 +718,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gnackId: 0
   currentCard: {fileID: 0}
-  TimeToLive: 120
+  TimeToLive: 30
   gnackTimerText: {fileID: 6468778982607275409}
   gnackNameText: {fileID: 8234961943375433559}
   spring: 2
@@ -727,6 +727,7 @@ MonoBehaviour:
   cardSuit: 3
   arcanaType: 4
   gnackDescription: The Page deals damage x2.
+  gnackCollider: {fileID: 0}
   isOnCard: 0
   startPosition: {x: 0, y: 0, z: 0}
   targetPosition: {x: 0, y: 0, z: 0}

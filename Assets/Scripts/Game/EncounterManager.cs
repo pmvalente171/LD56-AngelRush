@@ -321,7 +321,6 @@ namespace Game
             // kill them all!!!
             foreach (var gnack in card.activeGnacks)
             {
-                KillGnack(gnack.gnackId);
                 if (gnack.arcanaType == ArcanaType.KING)
                 {
                     // damage all the other cards
@@ -336,6 +335,7 @@ namespace Game
                         int ammout = card.cardData.cardSuit == gnack.cardSuit ? 2 : 1; // BALANCING
                         otherCard.Count -= ammout;
                     }
+                    KillGnack(gnack.gnackId);
 
                     // damage the hidden card
                     if (hiddenCard.Count > 0 && hiddenCard.WasFlipped)

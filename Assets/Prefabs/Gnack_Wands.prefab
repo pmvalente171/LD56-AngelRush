@@ -379,7 +379,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gnackId: 0
   currentCard: {fileID: 0}
-  TimeToLive: 240
+  TimeToLive: 60
   gnackTimerText: {fileID: 3660300380688386898}
   gnackNameText: {fileID: 2991059064289947043}
   spring: 2
@@ -389,6 +389,7 @@ MonoBehaviour:
   arcanaType: 0
   gnackDescription: Regular Pawns do double damage if they are on their corresponding
     suit.
+  gnackCollider: {fileID: 0}
   isOnCard: 0
   startPosition: {x: 0, y: 0, z: 0}
   targetPosition: {x: 0, y: 0, z: 0}
