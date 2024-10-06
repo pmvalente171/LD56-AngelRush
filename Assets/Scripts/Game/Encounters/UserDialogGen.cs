@@ -127,7 +127,8 @@ namespace Game.Encounters
         private static int CompareStrings(string a, string b) // returns the distance between two strings
         {
             int distance = 0;
-            for (int i = 0; i < a.Length; i++)
+            int length = Mathf.Min(a.Length, b.Length);
+            for (int i = 0; i < length; i++)
             {
                 if (a[i] != b[i])
                 {

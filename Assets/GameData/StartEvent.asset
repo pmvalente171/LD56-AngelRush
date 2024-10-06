@@ -15,11 +15,61 @@ MonoBehaviour:
   hiddenCardData:
     cardValue: 3
     cardSuit: 0
-  hints: []
-  encounterName: 
-  personName: 
-  encounterDescription: 
-  encounterInitialDialogue: 
+  hints:
+  - hintName: Ahah
+    hintText: Eheh
+    hintDialogue: Hmmm
+    hintEnemyName: Migo
+    hintEnemyImage: {fileID: 0}
+    hintPriority: 0
+    context:
+    - HELP
+    - OPPORTUNITY
+    - SUGGESTION
+  - hintName: Ahah
+    hintText: Eheh
+    hintDialogue: Hmmm
+    hintEnemyName: Migo
+    hintEnemyImage: {fileID: 0}
+    hintPriority: 0
+    context:
+    - HELP
+    - OPPORTUNITY
+    - SUGGESTION
+  - hintName: Ahah
+    hintText: Eheh
+    hintDialogue: Hmmm
+    hintEnemyName: Migo
+    hintEnemyImage: {fileID: 0}
+    hintPriority: 0
+    context:
+    - HELP
+    - OPPORTUNITY
+    - SUGGESTION
+  - hintName: Ahah
+    hintText: Eheh
+    hintDialogue: Hmmm
+    hintEnemyName: Migo
+    hintEnemyImage: {fileID: 0}
+    hintPriority: 0
+    context:
+    - HELP
+    - OPPORTUNITY
+    - SUGGESTION
+  - hintName: Ahah
+    hintText: Eheh
+    hintDialogue: Hmmm
+    hintEnemyName: Migo
+    hintEnemyImage: {fileID: 0}
+    hintPriority: 0
+    context:
+    - HELP
+    - OPPORTUNITY
+    - SUGGESTION
+  encounterName: Test
+  personName: Uiui
+  encounterDescription: Uiui
+  encounterInitialDialogue: blah blah blah
   encounterSuccessDialogue: 
   encounterFailureDialogue: 
   stressDialogue: []

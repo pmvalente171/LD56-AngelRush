@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Game.Encounters;
+using Game.UI;
+using Game.Util;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -20,6 +23,9 @@ namespace Game
         public List<Encounter> encounters = new ();
         public Encounter FinalEncounter;
         
+        [Space]
+        public EncounterLog encounterLog;
+        
         private Queue<Encounter> encounterQueue = new ();
         private CardDeck cardDeck;
         
@@ -29,6 +35,8 @@ namespace Game
         private List<Gnack> activeGnacks = new ();
         private List<Card> activeCards = new ();
         private Card hiddenCard;
+        
+        private Queue<Hint> hintQueue = new ();
         
         private int flipCount = 0;
         
@@ -184,7 +192,9 @@ namespace Game
         public void SwitchEncounter(Encounter newEncounter)
         {
             currentEncounter = newEncounter;
+            hintQueue = newEncounter.GetHints();
             
+            encounterLog.ClearLog();
             activeCardData.Clear();
             DrawCards();
             
@@ -226,8 +236,16 @@ namespace Game
             if (flipCount == 4)
             {
                 hiddenCard.Flip();
+                if (DiceUtil.D6() < 4)
+                {
+                    print("You were unlucky! >:(");
+                    Burnout();
+                }
                 NextEncounter();
+                return;
             }
+            
+            encounterLog.ProcessHint(hintQueue.Dequeue(), card.activeGnacks[^1].cardSuit);
         }
     }
 }

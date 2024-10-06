@@ -7,15 +7,17 @@ namespace Game.Encounters
     [Serializable]
     public class Hint
     {
+        public string hintName;
         [TextArea] 
         public string hintText;
         
-        [TextArea]
+        [Space] [TextArea]
         public string hintDialogue;
-        
-        public int hintPriority;
+        public string hintEnemyName;
+        public Sprite hintEnemyImage;
         
         [Space]
+        public int hintPriority;
         public List<string> context;
     }
 }

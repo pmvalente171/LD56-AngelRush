@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using Game.Util;
+using TMPro;
 using UnityEngine;
 
 namespace Game
@@ -12,6 +13,9 @@ namespace Game
         [HideInInspector] public int gnackId;
         [HideInInspector] public Card currentCard;
         
+        public float TimeToLive = 120f;
+        public TMP_Text gnackTimerText;
+        [Space]
         public float spring = 0.6f;
         public float damp = 1f;
         
@@ -32,8 +36,20 @@ namespace Game
         private Quaternion startRotation;
         private Quaternion targetRotation;
         
-        
         private bool isDragging;
+        
+        private IEnumerator GnackTimer()
+        {
+            float f = 0f;
+            while (f < 1f)
+            {
+                f += Time.deltaTime / TimeToLive;
+                gnackTimerText.text = $"{(int) (TimeToLive - Time.time)}";
+                yield return null;
+            }
+            
+            FindObjectOfType<EncounterManager>().KillGnack(gnackId);
+        }
         
         private IEnumerator Start()
         {
@@ -60,6 +76,7 @@ namespace Game
             
             transform.localScale = finalScale;
             collider.enabled = true;
+            StartCoroutine(GnackTimer());
         }
 
         private Vector3 GrabMousePosition()
@@ -86,7 +103,7 @@ namespace Game
                 return;
             }
             
-            if (card.IsHidden && card.cardData.cardSuit != cardSuit)
+            if (card.IsHidden && !card.WasFlipped && card.cardData.cardSuit != cardSuit)
             {
                 card.OnCardBurnout();
                 if (currentCard is null)
