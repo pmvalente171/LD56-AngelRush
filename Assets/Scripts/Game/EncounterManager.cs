@@ -20,10 +20,9 @@ namespace Game
     public class EncounterManager : MonoBehaviour
     {
         public int maxHp = 3;
-        public float startingScore = 20;
 
         [Space] public TMP_Text hpText;
-        public TMP_Text scoreText;
+        public ScoreManager scoreManager;
         
         [Space] public GameObject CrossPrefab;
         public Card CardPrefab;
@@ -53,7 +52,6 @@ namespace Game
         private int flipCount = 0;
         private int encouterCount = 0;
         private int currentHp = 3;
-        private float currentScore = 20;
 
         public void Start()
         {
@@ -69,7 +67,6 @@ namespace Game
             }
 
             SwitchEncounter(InitialEncounter);
-            currentScore = startingScore;
             currentHp = maxHp;
             
             // instance a gnack on the swap gnack
@@ -284,6 +281,8 @@ namespace Game
         public void OnCardFlipped(Card card)
         {
             flipCount++;
+            scoreManager.AddScore("Card Flipped", 1, 4f); // BALANCING
+            scoreManager.VerifyAndStartCombo("CARD_FLIPPED", new ComboString("Flipping COMBO!", 1, 4f));
 
             if (card.IsHidden)
                 return;
@@ -294,7 +293,6 @@ namespace Game
             // if there is a queen on the card save a gnack
             if (isQueenOnCard)
             {
-                // TODO HEAL THE PLAYER
                 RestoreHp();
                 
                 // if the queen as the same suit as the card, heal the player
@@ -338,6 +336,9 @@ namespace Game
 
             if (flipCount == 4)
             {
+                scoreManager.AddScore("Victory", 3, 10f); // BALANCING
+                scoreManager.VerifyAndStartCombo("COMPLETE", new ComboString("Vicotry COMBO!", 5, 10f));
+                
                 hiddenCard.Flip(true);
                 NextEncounter();
             }
@@ -358,15 +359,5 @@ namespace Game
         
         public void TakeDamage() => TakeDamage(1);
 
-        private void Update()
-        { 
-            currentScore -= Time.deltaTime;
-
-            if (Time.frameCount % 10 == 0)
-            {
-                // update the score every 10 frames
-                scoreText.text = currentScore.ToString("F2");
-            }
-        }
     }
 }
