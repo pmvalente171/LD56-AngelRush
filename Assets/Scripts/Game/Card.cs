@@ -24,11 +24,13 @@ namespace Game
         public float damping = 0.8f;
         
         public TMP_Text cardValueText;
+        public List<Transform> possiblePositions;
         
         [Space]
         public CardData cardData;
         public int index;
         
+        [HideInInspector] public bool WasFlipped = false;
         private Collider collider;
         private Bounds bounds;
         
@@ -44,7 +46,6 @@ namespace Game
         
         private int count = 0;
         private bool isHidden = false;
-        private bool wasFlipped = false;
         private bool isBeingRemoved = false;
         
         public event Action<Card> CardFlipped;
@@ -55,6 +56,7 @@ namespace Game
 
         public bool IsHidden
         {
+            get => isHidden;
             set
             {
                 isHidden = value;
@@ -89,6 +91,14 @@ namespace Game
             targetScale = startScale;
             startRotation = transform.rotation;
             cardValueText.text = cardData.cardValue + " of " + SuitNames[cardData.cardSuit];
+        }
+        
+        public Vector3 GetRandomPosition()
+        {
+            int posIndex = Random.Range(0, possiblePositions.Count);
+            var position = possiblePositions[posIndex].position;
+            possiblePositions.RemoveAt(posIndex);
+            return position;
         }
 
         private void OnMouseOver()
@@ -173,9 +183,9 @@ namespace Game
                 return;
             }
             
-            if (isHidden && gnackObject.cardSuit == cardData.cardSuit && !wasFlipped)
+            if (isHidden && gnackObject.cardSuit == cardData.cardSuit && !WasFlipped)
             {
-                wasFlipped = true;
+                WasFlipped = true;
                 Flip();
                 return;
             } 
@@ -184,9 +194,9 @@ namespace Game
             if (gnackObject.cardSuit == cardData.cardSuit) count--;
             cardValueText.text = count + " of " + SuitNames[cardData.cardSuit];
             
-            if (count <= 0 && !wasFlipped)
+            if (count <= 0 && !WasFlipped)
             {
-                wasFlipped = true;
+                WasFlipped = true;
                 Flip();
             }
             else if (count <= 0 && isHidden)

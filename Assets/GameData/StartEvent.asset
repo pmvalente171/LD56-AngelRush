@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: StartEvent
   m_EditorClassIdentifier: 
   hiddenCardData:
-    cardValue: 0
+    cardValue: 3
     cardSuit: 0
   hints: []
   encounterName: 

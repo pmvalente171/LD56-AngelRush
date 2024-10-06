@@ -23,6 +23,10 @@ namespace Game
         [HideInInspector] public Vector3 targetPosition;
         private Vector3 velocity;
         
+        
+        private Vector3 startScale;
+        private Vector3 targetScale;
+        
         private Quaternion startRotation;
         private Quaternion targetRotation;
         
@@ -38,6 +42,9 @@ namespace Game
             
             targetPosition = startPosition;
             targetRotation = startRotation;
+            
+            startScale = transform.localScale;
+            targetScale = startScale;
             
             var finalScale = transform.localScale;
             float f = 0f;
@@ -60,9 +67,20 @@ namespace Game
             return mousePos;
         }
         
-        private void DropGnack(Card card)
+        private bool DropGnack(Card card)
         {
+            if (card == null || (card.WasFlipped && !card.IsHidden))
+                return false;
+            
+            
             card.DropGnack(this);
+            
+            Vector3 cardPosition = card.GetRandomPosition();
+            targetPosition = cardPosition;
+            
+            float scaleMultiplier = card.cardData.cardSuit == cardSuit ? 0.8f : 0.5f;
+            targetScale = startScale * scaleMultiplier;
+            return true;
         }
         
         // on cursor exit
@@ -71,14 +89,15 @@ namespace Game
             if (CurrentGnack != this)
                 return;
 
-            if (Card.CurrentCard != null)
-            {
-                DropGnack(Card.CurrentCard);
-            }
+            bool succ = false;
             
-            // reset the position
+            // reset the scale and position
+            targetScale = startScale;
             targetPosition = startPosition;
-
+            
+            if (Card.CurrentCard != null)
+                succ = DropGnack(Card.CurrentCard);
+            
             // reset the rotation
             targetRotation = startRotation;
 
@@ -110,6 +129,10 @@ namespace Game
             
             // spring to target rotation
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
+            
+            // spring to target scale
+            if (Math.Abs((transform.localScale - targetScale).sqrMagnitude) < 0.005f) return;
+            transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * 10f);
         }
     }
 }
