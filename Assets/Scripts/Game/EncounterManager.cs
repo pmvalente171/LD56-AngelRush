@@ -213,7 +213,7 @@ namespace Game
             
             StartCoroutine(SpawnCards());
             if (currentEncounter == InitialEncounter)
-                StartCoroutine(SpawnGnacks(5)); // BALANCING
+                StartCoroutine(SpawnGnacks()); // BALANCING
             
         }
 
@@ -262,13 +262,15 @@ namespace Game
         
         public void OnCardVictory(Card card) 
         {
+            int gnacksInCard = card.activeGnacks.Count;
+            
             // kill them all!!!
             foreach (var gnack in card.activeGnacks)
                 KillGnack(gnack.gnackId);
             
             // aaand a new gnack appears :X
             // int halfCardValue = Mathf.CeilToInt(card.cardData.cardValue / 2f); // BALANCING
-            StartCoroutine(SpawnGnacks(2));
+            StartCoroutine(SpawnGnacks(gnacksInCard));
             
             // reset all the gnacks
             ResetGnacks();
@@ -285,6 +287,7 @@ namespace Game
                 return;
 
             bool isQueenOnCard = card.IsQueenOnCard(out var queen);
+            int gnacksInCard = card.activeGnacks.Count;
             var savedGnacks = new List<Gnack>();
             
             // if there is a queen on the card save a gnack
@@ -351,7 +354,7 @@ namespace Game
             
             // aaand a new gnack appears :X
             // int halfCardValue = Mathf.CeilToInt(card.cardData.cardValue / 2f); // BALANCING
-            StartCoroutine(SpawnGnacks(1));
+            StartCoroutine(SpawnGnacks(gnacksInCard));
             
             if (flipCount == 4)
             {
