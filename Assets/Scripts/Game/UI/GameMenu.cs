@@ -13,7 +13,7 @@ public class GameMenu : MonoBehaviour
     private void Awake()
     {
         // load the scores from the player prefs
-        var scores = PlayerPrefs.GetString("scores", "0,0,0,0"); 
+        var scores = PlayerPrefs.GetString("scores_u", "0,0,0,0,0"); 
         var scoreList = scores.Split(',');
         
         scoreList = scoreList.Skip(1).ToArray();

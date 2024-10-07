@@ -26,6 +26,10 @@ namespace Game
         public GameObject UIPanel;
         public TMP_Text finalScoreText;
         
+        [Space]
+        public List<AudioSource> damageSounds;
+        public AudioSource bootSound;
+        
         [Space] public int maxHp = 3;
         public TMP_Text hpText;
         public ScoreManager scoreManager;
@@ -332,6 +336,8 @@ namespace Game
         private IEnumerator AnimateDeathScreen()
         {
             float f = 0;
+            bootSound.Play();
+            
             while (f < 1)
             {
                 f += Time.deltaTime / 2f;
@@ -360,9 +366,19 @@ namespace Game
             StartCoroutine(AnimateDeathScreen());
         }
         
+        private void PlayDamageSound()
+        {
+            int index = Random.Range(0, damageSounds.Count);
+            
+            // change the pitch
+            damageSounds[index].pitch = Random.Range(1.4f, 1.6f);
+            damageSounds[index].Play();
+        }
+        
         public void TakeDamage(int damage)
         {
             currentHp -= damage;
+            PlayDamageSound();
             hpText.text = $"{currentHp}";
             if (currentHp <= 0 && !isGameOver)
             {

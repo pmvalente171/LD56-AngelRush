@@ -187,7 +187,7 @@ namespace Game
         {
             int ammount =  1;
             Gnack knight = null;
-            SpawnSound(0.6f);
+            SpawnSound(0.7f);
             bool isKnightOnCard = currentCard != null && currentCard.IsKnightOnCard(out knight);
             
             if (currentCard != null && arcanaType == ArcanaType.KNIGHT)

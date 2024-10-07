@@ -1102,8 +1102,7 @@ MonoBehaviour:
   damp: 10
   gnackName: Queen
   arcanaType: 2
-  gnackDescription: When removed saves a random pawn from the card, however, deals
-    0 damage.
+  gnackDescription: When removed heals you, however, deals 0 damage.
   gnackCollider: {fileID: 0}
   isOnCard: 0
   timeToLive: 0

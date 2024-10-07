@@ -1015,8 +1015,7 @@ MonoBehaviour:
   damp: 10
   gnackName: Pawn
   arcanaType: 0
-  gnackDescription: Regular Pawns do double damage if they are on their corresponding
-    suit.
+  gnackDescription: Regular Pawns do 1 damage per card.
   gnackCollider: {fileID: 0}
   isOnCard: 0
   timeToLive: 0
