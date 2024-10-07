@@ -17,14 +17,18 @@ namespace Game
         public GameObject cross;
     }
     
+    [RequireComponent(typeof(ParticleSpawner))]
     public class EncounterManager : MonoBehaviour
     {
-        public int maxHp = 3;
-
-        [Space] public TMP_Text hpText;
+        public Transform Boot;
+        public Transform FinalPosition;
+        public GameObject UIPanel;
+        public TMP_Text finalScoreText;
+        
+        [Space] public int maxHp = 3;
+        public TMP_Text hpText;
         public ScoreManager scoreManager;
         
-        [Space] public GameObject CrossPrefab;
         public Card CardPrefab;
         public List<Gnack> GnackPrefabs;
         public List<Gnack> GnackArcanaPrefabs;
@@ -45,15 +49,18 @@ namespace Game
         private List<Gnack> activeGnacks = new();
         private List<Card> activeCards = new();
 
+        private ParticleSpawner particleSpawner;
 
         private int flipCount = 0;
-        private int encouterCount = 0;
+        public static int encouterCount = 0;
         private int currentHp = 3;
+        private bool isGameOver = false;
 
         public void Start()
         {
             cardDeck = new CardDeck();
             encounterQueue = new Queue<Encounter>();
+            particleSpawner = GetComponent<ParticleSpawner>();
 
             int count = Mathf.Min(encounters.Count, 7);
             for (int i = 0; i < count; i++)
@@ -81,7 +88,12 @@ namespace Game
         public void RestoreHp()
         {
             currentHp = Mathf.Min(maxHp, currentHp + 1);
-            hpText.text = $"HP: {currentHp}";
+            hpText.text = $"{currentHp}";
+        }
+        
+        public void RestartGame()
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
         }
 
         private Gnack GetRandomGnack()
@@ -92,7 +104,9 @@ namespace Game
             var gnackList = DiceUtil.D100() > chance ? GnackPrefabs : GnackArcanaPrefabs; // BALANCING
 
             int index = Random.Range(0, gnackList.Count);
-            return gnackList[index];
+            var gnack = gnackList[index];
+            
+            return gnack;
         }
 
         private IEnumerator SpawnCards()
@@ -139,6 +153,7 @@ namespace Game
             if (gnack is null)
                 return;
 
+            particleSpawner.SpawnParticle(gnack.transform.position);
             activeGnacks.Remove(gnack);
 
             // reorganize gnack ids
@@ -256,8 +271,8 @@ namespace Game
         public void OnCardFlipped(Card card)
         {
             flipCount++;
-            scoreManager.AddScore("Card Flipped", 1, 4f); // BALANCING
-            scoreManager.VerifyAndStartCombo("CARD_FLIPPED", new ComboString("Flipping COMBO!", 1, 4f));
+            scoreManager.AddScore("Card Flipped", 4, 4f); // BALANCING
+            scoreManager.VerifyAndStartCombo("CARD_FLIPPED", new ComboString("Flipping COMBO!", 4, 4f));
 
             if (card.IsHidden)
                 return;
@@ -268,6 +283,9 @@ namespace Game
             // if there is a queen on the card save a gnack
             if (isQueenOnCard)
             {
+                scoreManager.AddScore("Go off Queen!", 1, 4f); // BALANCING
+                scoreManager.VerifyAndStartCombo("QUEEN_COMBO", new ComboString("SLAAYER!", 2, 10f));
+                scoreManager.VerifyCombo("KNIGHT_COMBO");
                 RestoreHp();
             }
 
@@ -276,9 +294,14 @@ namespace Game
             {
                 if (gnack.arcanaType == ArcanaType.KING)
                 {
+                    scoreManager.AddScore("King Move B)", 1, 4f); // BALANCING
+                    scoreManager.VerifyAndStartCombo("KING_COMBO", new ComboString("King COMBO!", 2, 10f));
+                    scoreManager.VerifyCombo("KNIGHT_COMBO");
+                    
                     // damage all the other cards
-                    foreach (var otherCard in activeCards)
+                    for(int i = 0; i < activeCards.Count; i++)
                     {
+                        var otherCard = activeCards[i];
                         if (otherCard == card)
                             continue;
 
@@ -299,26 +322,61 @@ namespace Game
 
             if (flipCount == 4)
             {
-                scoreManager.AddScore("Victory", 3, 10f); // BALANCING
-                scoreManager.VerifyAndStartCombo("COMPLETE", new ComboString("Vicotry COMBO!", 5, 10f));
+                scoreManager.AddScore("Victory", 5, 10f); // BALANCING
+                scoreManager.VerifyAndStartCombo("COMPLETE", new ComboString("Vicotry COMBO!", 10, 10f));
                 NextEncounter();
             }
+        }
+
+        private IEnumerator AnimateDeathScreen()
+        {
+            float f = 0;
+            while (f < 1)
+            {
+                f += Time.deltaTime / 2f;
+                Boot.position = Vector3.Lerp(Boot.position, FinalPosition.position, f);
+                yield return null;
+            }
+            
+            finalScoreText.gameObject.SetActive(true);
+            finalScoreText.text = scoreManager.currentScore.ToString("F2");
+            scoreManager.SaveScore();
+
+            yield return new WaitForSeconds(1f);
+        }
+        
+        public void GameOVer()
+        {
+            isGameOver = true;
+            
+            // Stop the countdown
+            scoreManager.isCounting = false;
+            
+            // turn off the UI
+            UIPanel.SetActive(false);
+            
+            // animate the boot
+            StartCoroutine(AnimateDeathScreen());
         }
         
         public void TakeDamage(int damage)
         {
             currentHp -= damage;
-            hpText.text = $"HP: {currentHp}";
-            if (currentHp <= 0)
+            hpText.text = $"{currentHp}";
+            if (currentHp <= 0 && !isGameOver)
             {
                 // game over
                 currentHp = 0;
-                print("Game Over");
-                hpText.text = $"HP: {currentHp}";
+                GameOVer();
             }
         }
         
         public void TakeDamage() => TakeDamage(1);
 
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.R))
+                RestartGame();
+        }
     }
 }

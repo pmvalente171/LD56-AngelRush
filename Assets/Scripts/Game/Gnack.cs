@@ -27,11 +27,8 @@ namespace Game
         [HideInInspector] public Card currentCard;
         
         public float TimeToLive = 120f;
-        public TMP_Text gnackTimerText;
-        
-        [Space]
-        public SuitIconMapping suitIconMapping;
-        public List<MeshRenderer> meshRenderer;
+        public Transform gnackVisualTimer;
+        public TMP_Text WarningText;
         
         [Space]
         public float spring = 0.6f;
@@ -45,6 +42,7 @@ namespace Game
         [HideInInspector] public Collider gnackCollider;
         
         [HideInInspector] public bool isOnCard;
+        [HideInInspector] public float timeToLive;
         
         [HideInInspector] public Vector3 startPosition;
         [HideInInspector] public Vector3 targetPosition;
@@ -59,19 +57,43 @@ namespace Game
         private bool isDragging;
         private Coroutine gnackTimer;
         private UnitDescription unitDescription;
+        
+        private Vector3 startBarScale;
         private float f; 
         
         public bool isOnSwap = false;
+        public bool isOnWarning = false;
+        
         
         private IEnumerator GnackTimer()
         {
             if (isOnSwap) yield break;
             
+            startBarScale = gnackVisualTimer.localScale;
+            Vector3 finalScale = new Vector3(0, startBarScale.y, startBarScale.z);
+            
             f = 0f;
             while (f < 1f)
             {
-                f += Time.deltaTime / TimeToLive;
-                gnackTimerText.text = $"{(int) (TimeToLive - TimeToLive * f)}";
+                f += Time.deltaTime / timeToLive;
+                gnackVisualTimer.localScale = Vector3.Lerp(startBarScale, finalScale, f);
+                
+                if (f > 0.66f && !isOnWarning)
+                {
+                    var tempStarScale = WarningText.transform.localScale;
+                    var tempF = 0f;
+                    
+                    while (tempF < 1f)
+                    {
+                        tempF += Time.deltaTime / 2f;
+                        WarningText.transform.localScale = Vector3.Lerp(Vector3.zero, tempStarScale, tempF);
+                        yield return null;
+                    }
+                    
+                    isOnWarning = true;
+                    WarningText.gameObject.SetActive(true);
+                }
+                
                 yield return null;
             }
             
@@ -110,10 +132,13 @@ namespace Game
             startScale = transform.localScale;
             targetScale = startScale;
             
-            this.f = 0f;
-            gnackTimerText.text = $"{(int)TimeToLive}";
+            timeToLive = TimeToLive;
+            timeToLive -= 10f * EncounterManager.encouterCount / 4f;
+            timeToLive = Mathf.Clamp(timeToLive, 10f, 120f);
             
+            this.f = 0f;
             var finalScale = transform.localScale;
+            
             float f = 0f;
             while (f < 1f)
             {
@@ -241,6 +266,13 @@ namespace Game
             // spring to target scale
             if (Math.Abs((transform.localScale - targetScale).sqrMagnitude) < 0.005f) return;
             transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * 10f);
+            
+            // if is on warning
+            if (isOnWarning)
+            {
+                float sin = Mathf.Sin(Time.time * 10f) * 0.5f;
+                WarningText.transform.localScale = new Vector3(1f + sin, 1f + sin, 1f + sin);
+            }
         }
     }
 }

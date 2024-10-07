@@ -12,23 +12,25 @@ namespace Game
         public int score;
         public float time;
 
-        public ComboString(string flippingCombo, int i, float i1)
+        public ComboString(string flippingCombo, int newScore, float newTime)
         {
             actionText = flippingCombo;
-            score = i;
-            time = i1;
+            score = newScore;
+            time = newTime;
         }
     }
     
     public class ScoreManager : MonoBehaviour
     {
+        public bool isCounting = true;
+        
         public float startingScore = 20;
         public TMP_Text scoreText;
         
         [Space] public Transform scorePanel;
         public ActionText actionTextPrefab;
         
-        private float currentScore = 20;
+        [HideInInspector] public float currentScore = 20;
         private Dictionary<string, ComboString> comboStrings = new ();
         
         private void Awake()
@@ -37,7 +39,9 @@ namespace Game
         }
 
         private void Update()
-        { 
+        {
+            if (!isCounting) return;
+            
             currentScore -= Time.deltaTime;
             if (Time.frameCount % 10 == 0)
             {

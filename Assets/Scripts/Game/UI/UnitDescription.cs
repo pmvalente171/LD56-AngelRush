@@ -46,8 +46,9 @@ namespace Game.UI
         {
             if (fadeCoroutine != null)
                 StopCoroutine(fadeCoroutine);
-            
-            fadeCoroutine = StartCoroutine(FadeOut());
+
+            if (enabled)
+                fadeCoroutine = StartCoroutine(FadeOut());
         }
         
         public IEnumerator FadeIn()
@@ -65,7 +66,8 @@ namespace Game.UI
             if (fadeCoroutine != null)
                 StopCoroutine(fadeCoroutine);
             
-            fadeCoroutine = StartCoroutine(FadeIn());
+            if (enabled)
+                fadeCoroutine = StartCoroutine(FadeIn());
         }
         
         
