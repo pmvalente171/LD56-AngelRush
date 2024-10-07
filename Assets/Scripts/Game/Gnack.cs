@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using Game.UI;
 using Game.Util;
 using TMPro;
@@ -27,13 +28,16 @@ namespace Game
         
         public float TimeToLive = 120f;
         public TMP_Text gnackTimerText;
-        public TMP_Text gnackNameText;
+        
+        [Space]
+        public SuitIconMapping suitIconMapping;
+        public List<MeshRenderer> meshRenderer;
+        
         [Space]
         public float spring = 0.6f;
         public float damp = 1f;
         
         [Space] public string gnackName;
-        public CardSuit cardSuit;
         public ArcanaType arcanaType;
         [TextArea] public string gnackDescription;
         
@@ -122,9 +126,6 @@ namespace Game
             gnackTimer = StartCoroutine(GnackTimer());
         }
 
-        public void UpdateName() =>
-            gnackNameText.text = Card.SuitNames[cardSuit];
-
         private Vector3 GrabMousePosition()
         {
             Vector3 mousePos = Input.mousePosition;
@@ -135,7 +136,7 @@ namespace Game
         
         private void DropGnack(Card card)
         {
-            int ammount = currentCard?.cardData.cardSuit == cardSuit ? 2 : 1;
+            int ammount =  1;
             Gnack knight = null;
             bool isKnightOnCard = currentCard != null && currentCard.IsKnightOnCard(out knight);
             
@@ -164,19 +165,6 @@ namespace Game
                 return;
             }
             
-            if (card.IsHidden && !card.WasFlipped && card.cardData.cardSuit != cardSuit)
-            {
-                card.OnCardBurnout();
-                if (currentCard is null)
-                    return;
-                
-                currentCard.Count += ammount;
-                currentCard.activeGnacks.Remove(this);
-                
-                isOnCard = false;
-                currentCard = null;
-                return;
-            }
             
             if (currentCard is not null)
             {
@@ -191,7 +179,7 @@ namespace Game
             targetPosition = cardPosition;
             currentCard = card;
             
-            float scaleMultiplier = card.cardData.cardSuit == cardSuit ? 0.8f : 0.5f;
+            float scaleMultiplier = 0.5f;
             targetScale = startScale * scaleMultiplier;
             card.DropGnack(this);
         }

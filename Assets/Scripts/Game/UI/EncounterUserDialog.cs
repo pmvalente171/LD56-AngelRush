@@ -17,7 +17,6 @@ namespace Game.UI
         {
             userName.text = name;
             userDialogue.text = dialogue;
-            suitImage.sprite = suitIconMapping.GetSuitIcon(suit);
         }
     }
 }

@@ -103,7 +103,7 @@ namespace Game
             targetPosition = startPosition;
             targetScale = startScale;
             startRotation = transform.rotation;
-            cardValueText.text = cardData.cardValue + " of " + SuitNames[cardData.cardSuit];
+            cardValueText.text = cardData.cardValue.ToString();
         }
         
         public Vector3 GetRandomPosition()
@@ -112,7 +112,7 @@ namespace Game
             var position = possiblePositions[posIndex].position;
             
             possiblePositions.RemoveAt(posIndex);
-            return position;
+            return position + Vector3.up * 0.5f;
         }
 
         private void OnMouseOver()
@@ -179,7 +179,7 @@ namespace Game
         
         private void UpdateCount()
         {
-            cardValueText.text = count + " of " + SuitNames[cardData.cardSuit];
+            cardValueText.text = count.ToString();
 
             if (count <= 0 && !WasFlipped)
             {
@@ -207,23 +207,10 @@ namespace Game
 
         public void DropGnack(Gnack gnackObject)
         {
-            if (isHidden && !WasFlipped && gnackObject.cardSuit != cardData.cardSuit)
-            {
-                // take burnout
-                OnCardBurnout();
-                return;
-            }
-            
-            if (isHidden && gnackObject.cardSuit == cardData.cardSuit && !WasFlipped)
-            {
-                WasFlipped = true;
-                Flip();
-                return;
-            } 
             
             var isKnightOnCard = IsKnightOnCard(out var knight);
             
-            int amount = gnackObject.cardSuit == cardData.cardSuit ? 2 : 1;
+            int amount = 1;
             
             if (gnackObject.arcanaType == ArcanaType.KNIGHT)
                 amount += activeGnacks.Count - 1;

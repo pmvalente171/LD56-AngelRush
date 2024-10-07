@@ -9,12 +9,10 @@ namespace Game
     public class CardData
     {
         public int cardValue;
-        public CardSuit cardSuit;
         
         public CardData(int cardValue, CardSuit cardSuit)
         {
             this.cardValue = cardValue;
-            this.cardSuit = cardSuit;
         }
         
         public CardData() { }

@@ -120,11 +120,6 @@ namespace Game
             {
                 Gnack gnack = Instantiate(GetRandomGnack(), board.gnacks[i].position, Quaternion.identity);
                 gnack.gnackId = i;
-                if (gnack.arcanaType != ArcanaType.NONE)
-                {
-                    gnack.cardSuit = DiceUtil.DCardSuit();
-                    gnack.UpdateName();
-                }
 
                 activeGnacks.Add(gnack);
                 max = Mathf.Min(max, board.gnacks.Count); // TODO: cop out
@@ -274,10 +269,6 @@ namespace Game
             if (isQueenOnCard)
             {
                 RestoreHp();
-                
-                // if the queen as the same suit as the card, heal the player
-                if (queen.cardSuit == card.cardData.cardSuit)
-                    RestoreHp();
             }
 
             // kill them all!!!
@@ -294,7 +285,7 @@ namespace Game
                         if (otherCard.Count <= 0)
                             continue;
 
-                        int ammout = card.cardData.cardSuit == gnack.cardSuit ? 2 : 1; 
+                        int ammout = 1; 
                         otherCard.Count -= ammout;
                     }
                 }
