@@ -20,7 +20,9 @@ namespace Game
         
         public static Card CurrentCard;
         
-        public float spring = 0.1f;
+        public AudioEffects audioEffects;
+        
+        [Space] public float spring = 0.1f;
         public float damping = 0.8f;
         
         public TMP_Text cardValueText;
@@ -156,6 +158,7 @@ namespace Game
         public void Flip(bool special = false)
         {
             targetRotation = transform.rotation * Quaternion.Euler(0, 0, 180);
+            audioEffects.PlayOneShot();
             
             // means its called from the outside
             if (special) return;
@@ -172,6 +175,7 @@ namespace Game
 
         public void RemoveCard()
         {
+            audioEffects.PlayOneShot();
             targetPosition = startPosition + new Vector3(0, 0f, -9.3f);
             isBeingRemoved = true;
             StartCoroutine(RemoveCardRoutine());

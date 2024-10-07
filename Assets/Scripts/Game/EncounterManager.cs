@@ -6,6 +6,7 @@ using Game.UI;
 using Game.Util;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 namespace Game
@@ -93,7 +94,7 @@ namespace Game
         
         public void RestartGame()
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+            UnityEngine.SceneManagement.SceneManager.LoadScene(1);
         }
 
         private Gnack GetRandomGnack()
@@ -137,7 +138,7 @@ namespace Game
 
                 activeGnacks.Add(gnack);
                 max = Mathf.Min(max, board.gnacks.Count); // TODO: cop out
-                yield return new WaitForSeconds(0.5f);
+                yield return new WaitForSeconds(0.25f);
             }
         }
 
@@ -377,6 +378,9 @@ namespace Game
         {
             if (Input.GetKeyDown(KeyCode.R))
                 RestartGame();
+
+            if (Input.GetKeyDown(KeyCode.Backspace))
+                SceneManager.LoadScene(0);
         }
     }
 }

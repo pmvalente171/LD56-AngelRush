@@ -26,7 +26,10 @@ namespace Game
         [HideInInspector] public int gnackId;
         [HideInInspector] public Card currentCard;
         
-        public float TimeToLive = 120f;
+        public AudioSource gnackSpawn;
+        public AudioSource gnackNotif;
+        
+        [Space] public float TimeToLive = 120f;
         public Transform gnackVisualTimer;
         public TMP_Text WarningText;
         
@@ -65,6 +68,25 @@ namespace Game
         public bool isOnWarning = false;
         
         
+        public void SpawnSound(float volume = 1f)
+        {
+            // slight variation in pitch
+            var pitch = UnityEngine.Random.Range(0.9f, 1.1f);
+            
+            // play the sound
+            gnackSpawn.volume = volume;
+            AudioUtil.PlayOneShot(gnackSpawn, pitch);
+        }
+        
+        public void NotifSound()
+        {
+            // slight variation in pitch
+            var pitch = UnityEngine.Random.Range(0.9f, 1.1f);
+            
+            // play the sound
+            AudioUtil.PlayOneShot(gnackNotif, pitch);
+        }
+        
         private IEnumerator GnackTimer()
         {
             if (isOnSwap) yield break;
@@ -91,6 +113,7 @@ namespace Game
                     }
                     
                     isOnWarning = true;
+                    NotifSound();
                     WarningText.gameObject.SetActive(true);
                 }
                 
@@ -138,11 +161,12 @@ namespace Game
             
             this.f = 0f;
             var finalScale = transform.localScale;
+            SpawnSound();
             
             float f = 0f;
             while (f < 1f)
             {
-                f += Time.deltaTime * 2f;
+                f += Time.deltaTime / 0.3f;
                 transform.localScale = Vector3.Lerp(Vector3.zero, finalScale, f);
                 yield return null;
             }
@@ -163,6 +187,7 @@ namespace Game
         {
             int ammount =  1;
             Gnack knight = null;
+            SpawnSound(0.6f);
             bool isKnightOnCard = currentCard != null && currentCard.IsKnightOnCard(out knight);
             
             if (currentCard != null && arcanaType == ArcanaType.KNIGHT)
